@@ -53,7 +53,7 @@ async function handleCreateForm() {
           </div>
           <div class="feature-item">
             <h3>Zero Tracking</h3>
-            <p>No cookies, no fingerprinting, no IP logging. GDPR-friendly by design.</p>
+            <p>No cookies, no fingerprinting, no analytics. IPs only for rate limiting. GDPR-friendly by design.</p>
           </div>
           <div class="feature-item">
             <h3>Submission Inbox</h3>
@@ -69,7 +69,7 @@ async function handleCreateForm() {
           </div>
           <div class="feature-item">
             <h3>Rate Limiting</h3>
-            <p>Protect your forms from spam and abuse with configurable rate limits per form.</p>
+            <p>Protect your forms from spam and abuse with configurable per-IP rate limits. Set submissions per hour for each form.</p>
           </div>
         </div>
       </div>
@@ -149,8 +149,8 @@ async function handleCreateForm() {
             <p>We don't collect browser fingerprints.</p>
           </div>
           <div class="privacy-feature">
-            <h3>No IP logging</h3>
-            <p>IP addresses are not logged.</p>
+            <h3>No IP tracking</h3>
+            <p>IP addresses are only stored for rate limiting (abuse prevention), never for tracking or analytics.</p>
           </div>
           <div class="privacy-feature">
             <h3>Encrypted at rest</h3>
@@ -180,18 +180,18 @@ async function handleCreateForm() {
             <div class="footer-column">
               <h4>Product</h4>
               <a href="#features">Features</a>
-              <a href="#docs">Documentation</a>
+              <NuxtLink to="/docs">Documentation</NuxtLink>
             </div>
             <div class="footer-column">
               <h4>Resources</h4>
               <a href="#">GitHub</a>
-              <a href="#">API Reference</a>
+              <NuxtLink to="/docs#api-reference">API Reference</NuxtLink>
               <a href="#">Changelog</a>
             </div>
             <div class="footer-column">
               <h4>Legal</h4>
-              <a href="#">Privacy Policy</a>
-              <a href="#">Terms of Service</a>
+              <NuxtLink to="/privacy">Privacy Policy</NuxtLink>
+              <NuxtLink to="/terms">Terms of Service</NuxtLink>
             </div>
           </div>
         </div>
@@ -216,7 +216,6 @@ async function handleCreateForm() {
   padding: 0 40px;
 }
 
-/* Hero Section */
 .hero {
   min-height: 100vh;
   display: flex;
@@ -312,7 +311,6 @@ async function handleCreateForm() {
   background-color: transparent;
 }
 
-/* Sections */
 section {
   padding: 120px 0;
   position: relative;
@@ -356,7 +354,6 @@ section {
   margin-top: 0;
 }
 
-/* Features */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -392,7 +389,6 @@ section {
   font-size: 16px;
 }
 
-/* How It Works */
 .how-it-works {
   background-color: var(--section-bg);
 }
@@ -444,7 +440,6 @@ section {
   font-size: 16px;
 }
 
-/* Developer Experience */
 .dev-features {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -479,7 +474,6 @@ section {
   font-size: 16px;
 }
 
-/* Privacy & Security */
 .privacy-security {
   background-color: var(--section-bg);
 }
@@ -519,7 +513,6 @@ section {
   font-size: 16px;
 }
 
-/* Footer */
 .footer {
   margin-top: auto;
   padding: 100px 0 40px;
@@ -587,7 +580,6 @@ section {
   font-size: 14px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .container {
     padding: 0 24px;

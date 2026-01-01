@@ -108,7 +108,7 @@ async function handleLogin() {
   width: 100%;
   height: 100%;
   min-height: 100%;
-  background-image: url('/loginsignup.png');
+  background-image: url('https://2lyfanvqy9.ufs.sh/f/ocSxC2zlR1ZuztzEeWqDIOHFQRo3StmxwCNcLqXTn9Gb0riK');
   background-repeat: repeat;
   background-size: cover;
   background-position: center;
@@ -118,15 +118,123 @@ async function handleLogin() {
 @media (max-width: 968px) {
   .auth-container {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 0;
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  .auth-page {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  .auth-left {
+    padding: 20px;
+    min-height: calc(100vh - 200px);
   }
   
   .auth-right {
     order: -1;
+    height: 200px;
+    min-height: 200px;
   }
   
   .auth-image {
-    max-width: 400px;
+    height: 200px;
+    min-height: 200px;
+  }
+  
+  .auth-card {
+    padding: 20px;
+    max-width: 100%;
+  }
+  
+  h1 {
+    font-size: 24px;
+  }
+  
+  .subtitle {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  
+  .auth-form {
+    gap: 14px;
+  }
+  
+  input {
+    font-size: 16px;
+    padding: 10px 14px;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-left {
+    padding: 16px;
+    min-height: calc(100vh - 150px);
+  }
+  
+  .auth-right {
+    height: 150px;
+    min-height: 150px;
+  }
+  
+  .auth-image {
+    height: 150px;
+    min-height: 150px;
+  }
+  
+  .auth-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  h1 {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+  
+  .subtitle {
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+  
+  .auth-form {
+    gap: 12px;
+  }
+  
+  label {
+    font-size: 13px;
+  }
+  
+  input {
+    font-size: 16px;
+    padding: 10px 12px;
+  }
+  
+  .btn {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+  
+  .error-message,
+  .forgot-password,
+  .auth-footer {
+    font-size: 12px;
+  }
+  
+  .forgot-password {
+    margin-top: 10px;
+  }
+  
+  .auth-footer {
+    margin-top: 12px;
   }
 }
 

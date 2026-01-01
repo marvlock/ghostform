@@ -7,9 +7,7 @@ function generateOTP(): string {
 
 async function saveOTP(email: string, code: string, expiresAt: number) {
   const otpsCollection = await collections.otps()
-  // Remove existing OTP for this email
   await otpsCollection.deleteMany({ email, type: 'password-reset' })
-  // Add new OTP
   await otpsCollection.insertOne({ email, code, expiresAt, type: 'password-reset' })
 }
 
@@ -24,7 +22,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email)) {
     throw createError({
@@ -33,12 +30,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Check if user exists
   const usersCollection = await collections.users()
   const user = await usersCollection.findOne({ email, emailVerified: true })
   
-  // Don't reveal if user exists or not (security best practice)
-  // Always return success message
   if (!user) {
     return {
       success: true,
@@ -46,14 +40,10 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Generate OTP
   const otp = generateOTP()
-  const expiresAt = Date.now() + 15 * 60 * 1000 // 15 minutes
+  const expiresAt = Date.now() + 15 * 60 * 1000
 
-  // Store OTP
   await saveOTP(email, otp, expiresAt)
-
-  // Send OTP email
   const resend = new Resend(process.env.RESEND_API_KEY)
   
   try {

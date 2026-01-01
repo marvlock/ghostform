@@ -1,13 +1,24 @@
 <script setup lang="ts">
-const { isAuthenticated, checkAuth } = useAuth()
+const { isAuthenticated, checkAuth, loading: authLoading } = useAuth()
 const route = useRoute()
 const formId = route.query.id as string | undefined
 const isEditing = !!formId
 
 await checkAuth()
 
-if (!isAuthenticated.value) {
-  await navigateTo('/login')
+if (process.client) {
+  onMounted(async () => {
+    if (!isAuthenticated.value) {
+      await checkAuth()
+      if (!isAuthenticated.value) {
+        await navigateTo('/login')
+      }
+    }
+  })
+} else {
+  if (!isAuthenticated.value) {
+    await navigateTo('/login')
+  }
 }
 
 const form = ref({
@@ -110,9 +121,7 @@ function getOptionsText(field) {
 }
 
 function updateOptionsText(field, value) {
-  // Store raw value to preserve newlines during editing
   optionsText.value[field.id] = value
-  // Update options array (filter empty lines)
   const lines = value.split('\n').map(o => o.trim()).filter(o => o !== '')
   field.options = lines
 }
@@ -125,7 +134,6 @@ function initOptionsText(field) {
 
 function toggleDropdown(key: string) {
   openDropdowns.value[key] = !openDropdowns.value[key]
-  // Close other dropdowns
   Object.keys(openDropdowns.value).forEach(k => {
     if (k !== key) {
       openDropdowns.value[k] = false

@@ -33,7 +33,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Return HTML form page
   return sendRedirect(event, `/form/${slug}`)
 })
 

@@ -1,18 +1,34 @@
 <script setup lang="ts">
-const { isAuthenticated, checkAuth } = useAuth()
+const { isAuthenticated, checkAuth, loading: authLoading } = useAuth()
 const forms = ref([])
 const loading = ref(true)
 const copiedSlug = ref<string | null>(null)
+const copiedEmbedSlug = ref<string | null>(null)
+const copiedEmbedType = ref<string | null>(null)
 const updatingForms = ref(new Set<string>())
 const deletingFormId = ref<string | null>(null)
 const showDeleteConfirm = ref(false)
 const formToDelete = ref<any>(null)
+const showEmbedModal = ref(false)
+const embedFormSlug = ref<string | null>(null)
+const embedOptions = ref<any>(null)
 const notification = ref({ show: false, message: '', type: 'success' as 'success' | 'error' })
 
 await checkAuth()
 
-if (!isAuthenticated.value) {
-  await navigateTo('/login')
+if (process.client) {
+  onMounted(async () => {
+    if (!isAuthenticated.value) {
+      await checkAuth()
+      if (!isAuthenticated.value) {
+        await navigateTo('/login')
+      }
+    }
+  })
+} else {
+  if (!isAuthenticated.value) {
+    await navigateTo('/login')
+  }
 }
 
 try {
@@ -58,6 +74,36 @@ async function copyFormLink(slug: string) {
     setTimeout(() => {
       copiedSlug.value = null
     }, 2000)
+  }
+}
+
+async function showEmbedOptions(slug: string) {
+  try {
+    embedOptions.value = await $fetch(`/api/forms/${slug}/embed?format=json`)
+    embedFormSlug.value = slug
+    showEmbedModal.value = true
+  } catch (err: any) {
+    showNotification(err.data?.message || 'Failed to get embed options', 'error')
+  }
+}
+
+async function copyEmbedCode(type: 'html' | 'iframe', slug: string) {
+  try {
+    if (!embedOptions.value) {
+      embedOptions.value = await $fetch(`/api/forms/${slug}/embed?format=json`)
+    }
+    
+    const codeToCopy = type === 'html' ? embedOptions.value.html : embedOptions.value.iframe
+    await navigator.clipboard.writeText(codeToCopy)
+    copiedEmbedSlug.value = slug
+    copiedEmbedType.value = type
+    showNotification(`${type === 'html' ? 'HTML' : 'iframe'} code copied to clipboard!`, 'success')
+    setTimeout(() => {
+      copiedEmbedSlug.value = null
+      copiedEmbedType.value = null
+    }, 2000)
+  } catch (err: any) {
+    showNotification(err.data?.message || 'Failed to copy embed code', 'error')
   }
 }
 
@@ -162,15 +208,25 @@ async function handleDeleteForm() {
           <div class="form-card-body">
             <div class="form-slug-container">
               <p class="form-slug">{{ formUrl(form.slug) }}</p>
-              <button @click="copyFormLink(form.slug)" class="copy-link-btn" :title="copiedSlug === form.slug ? 'Copied!' : 'Copy link'">
-                <svg v-if="copiedSlug !== form.slug" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M5.5 4.5V3.5C5.5 2.67 6.17 2 7 2H12.5C13.33 2 14 2.67 14 3.5V9C14 9.83 13.33 10.5 12.5 10.5H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  <path d="M3.5 5.5H10.5C11.33 5.5 12 6.17 12 7V12.5C12 13.33 11.33 14 10.5 14H3.5C2.67 14 2 13.33 2 12.5V7C2 6.17 2.67 5.5 3.5 5.5Z" stroke="currentColor" stroke-width="1.5"/>
-                </svg>
-                <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </button>
+              <div class="form-actions-inline">
+                <button @click="copyFormLink(form.slug)" class="copy-link-btn" :title="copiedSlug === form.slug ? 'Copied!' : 'Copy link'">
+                  <svg v-if="copiedSlug !== form.slug" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M5.5 4.5V3.5C5.5 2.67 6.17 2 7 2H12.5C13.33 2 14 2.67 14 3.5V9C14 9.83 13.33 10.5 12.5 10.5H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M3.5 5.5H10.5C11.33 5.5 12 6.17 12 7V12.5C12 13.33 11.33 14 10.5 14H3.5C2.67 14 2 13.33 2 12.5V7C2 6.17 2.67 5.5 3.5 5.5Z" stroke="currentColor" stroke-width="1.5"/>
+                  </svg>
+                  <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+                <button @click="showEmbedOptions(form.slug)" class="copy-link-btn" title="Embed form">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M5.5 2.5H3.5C2.67 2.5 2 3.17 2 4V12.5C2 13.33 2.67 14 3.5 14H12C12.83 14 13.5 13.33 13.5 12.5V10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M10.5 2.5H13.5C14.33 2.5 15 3.17 15 4V6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M9.5 7.5L13.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M13.5 3.5H10.5V6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
             </div>
             <p class="form-meta">{{ form.fields?.length || 0 }} fields</p>
             <p class="form-date">Created {{ formatDate(form.createdAt) }}</p>
@@ -225,6 +281,94 @@ async function handleDeleteForm() {
         </div>
         <p class="notification-message">{{ notification.message }}</p>
         <button @click="notification.show = false" class="notification-close">OK</button>
+      </div>
+    </div>
+
+    <!-- Embed Options Modal -->
+    <div v-if="showEmbedModal && embedOptions" class="modal-overlay" @click.self="showEmbedModal = false">
+      <div class="modal-content embed-modal">
+        <div class="modal-header">
+          <h3 class="modal-title">Embed Form</h3>
+          <button @click="showEmbedModal = false; embedOptions = null; embedFormSlug = null" class="modal-close-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="embed-options">
+          <!-- Option 1: Full HTML Embed -->
+          <div class="embed-option">
+            <div class="embed-option-header">
+              <h4>Full HTML Embed</h4>
+              <p class="embed-option-desc">Copy and paste the complete HTML form with all styles. Works everywhere, full control.</p>
+            </div>
+            <div class="embed-code-container">
+              <pre class="embed-code"><code>{{ embedOptions.html.substring(0, 200) }}...</code></pre>
+            </div>
+            <button 
+              @click="copyEmbedCode('html', embedFormSlug!)" 
+              class="btn btn-primary btn-small"
+            >
+              <svg v-if="copiedEmbedSlug !== embedFormSlug || copiedEmbedType !== 'html'" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M5.5 4.5V3.5C5.5 2.67 6.17 2 7 2H12.5C13.33 2 14 2.67 14 3.5V9C14 9.83 13.33 10.5 12.5 10.5H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M3.5 5.5H10.5C11.33 5.5 12 6.17 12 7V12.5C12 13.33 11.33 14 10.5 14H3.5C2.67 14 2 13.33 2 12.5V7C2 6.17 2.67 5.5 3.5 5.5Z" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              {{ copiedEmbedSlug === embedFormSlug && copiedEmbedType === 'html' ? 'Copied!' : 'Copy HTML' }}
+            </button>
+          </div>
+
+          <!-- Option 2: iframe Embed -->
+          <div class="embed-option">
+            <div class="embed-option-header">
+              <h4>iframe Embed (One-liner)</h4>
+              <p class="embed-option-desc">Simple one-line code. Works without JavaScript. Best for quick embeds.</p>
+            </div>
+            <div class="embed-code-container">
+              <pre class="embed-code"><code>{{ embedOptions.iframe }}</code></pre>
+            </div>
+            <button 
+              @click="copyEmbedCode('iframe', embedFormSlug!)" 
+              class="btn btn-primary btn-small"
+            >
+              <svg v-if="copiedEmbedSlug !== embedFormSlug || copiedEmbedType !== 'iframe'" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M5.5 4.5V3.5C5.5 2.67 6.17 2 7 2H12.5C13.33 2 14 2.67 14 3.5V9C14 9.83 13.33 10.5 12.5 10.5H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M3.5 5.5H10.5C11.33 5.5 12 6.17 12 7V12.5C12 13.33 11.33 14 10.5 14H3.5C2.67 14 2 13.33 2 12.5V7C2 6.17 2.67 5.5 3.5 5.5Z" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              {{ copiedEmbedSlug === embedFormSlug && copiedEmbedType === 'iframe' ? 'Copied!' : 'Copy iframe' }}
+            </button>
+          </div>
+
+          <!-- Option 3: Direct Link -->
+          <div class="embed-option">
+            <div class="embed-option-header">
+              <h4>Direct Link</h4>
+              <p class="embed-option-desc">Share this link directly or use it in your own HTML.</p>
+            </div>
+            <div class="embed-code-container">
+              <pre class="embed-code"><code>{{ embedOptions.directUrl }}</code></pre>
+            </div>
+            <button 
+              @click="copyFormLink(embedFormSlug!)" 
+              class="btn btn-primary btn-small"
+            >
+              <svg v-if="copiedSlug !== embedFormSlug" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M5.5 4.5V3.5C5.5 2.67 6.17 2 7 2H12.5C13.33 2 14 2.67 14 3.5V9C14 9.83 13.33 10.5 12.5 10.5H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M3.5 5.5H10.5C11.33 5.5 12 6.17 12 7V12.5C12 13.33 11.33 14 10.5 14H3.5C2.67 14 2 13.33 2 12.5V7C2 6.17 2.67 5.5 3.5 5.5Z" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              {{ copiedSlug === embedFormSlug ? 'Copied!' : 'Copy Link' }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -394,6 +538,12 @@ h1 {
   margin-bottom: 8px;
 }
 
+.form-actions-inline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .form-slug {
   font-family: 'Courier New', monospace;
   font-size: 14px;
@@ -506,7 +656,6 @@ h1 {
   min-width: 100px;
 }
 
-/* Delete Form Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -538,6 +687,87 @@ h1 {
   box-shadow: var(--shadow-lg);
   margin: auto;
   flex-shrink: 0;
+}
+
+.embed-modal {
+  max-width: 800px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+  background: var(--section-bg);
+  color: var(--text-color);
+}
+
+.embed-options {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.embed-option {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  background: var(--section-bg);
+}
+
+.embed-option-header h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0 0 8px 0;
+}
+
+.embed-option-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.embed-code-container {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+}
+
+.embed-code {
+  margin: 0;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-size: 13px;
+  color: var(--text-color);
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+.embed-code code {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
 }
 
 .modal-title {

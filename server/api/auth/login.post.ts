@@ -40,15 +40,15 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Create session
   const sessionId = crypto.randomUUID()
   await saveSession(sessionId, user.id)
 
   setCookie(event, 'session', sessionId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 60 * 60 * 24 * 30 // 30 days
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    path: '/'
   })
 
   return {

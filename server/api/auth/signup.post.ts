@@ -8,9 +8,7 @@ function generateOTP(): string {
 
 async function saveOTP(email: string, code: string, expiresAt: number) {
   const otpsCollection = await collections.otps()
-  // Remove existing OTP for this email
   await otpsCollection.deleteMany({ email, type: 'signup' })
-  // Add new OTP
   await otpsCollection.insertOne({ email, code, expiresAt, type: 'signup' })
 }
 
@@ -25,7 +23,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email)) {
     throw createError({
@@ -34,7 +31,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Check if user already exists
   const usersCollection = await collections.users()
   const existingUser = await usersCollection.findOne({ email, emailVerified: true })
   
@@ -45,14 +41,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Generate OTP
   const otp = generateOTP()
-  const expiresAt = Date.now() + 10 * 60 * 1000 // 10 minutes
+  const expiresAt = Date.now() + 10 * 60 * 1000
 
-  // Store OTP
   await saveOTP(email, otp, expiresAt)
-
-  // Send OTP email
   const resend = new Resend(process.env.RESEND_API_KEY)
   
   try {
@@ -78,11 +70,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Hash password temporarily (will be saved after OTP verification)
   const hashedPassword = await bcrypt.hash(password, 10)
 
-  // Store pending user (will be activated after OTP verification)
-  // Remove any existing pending user for this email
   await usersCollection.deleteMany({ email, pending: true })
   await usersCollection.insertOne({
     email,

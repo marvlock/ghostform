@@ -23,6 +23,33 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  if (body.slug && body.slug !== form.slug) {
+    if (!/^[a-z0-9-]+$/.test(body.slug)) {
+      throw createError({
+        statusCode: 400,
+        message: 'Slug can only contain lowercase letters, numbers, and hyphens'
+      })
+    }
+
+    let finalSlug = body.slug
+    let counter = 1
+    while (true) {
+      const existingForm = await formsCollection.findOne({ slug: finalSlug })
+      if (!existingForm || existingForm.id === id) {
+        break
+      }
+      finalSlug = `${body.slug}-${counter}`
+      counter++
+      
+      if (counter > 1000) {
+        finalSlug = `${body.slug}-${Date.now()}`
+        break
+      }
+    }
+    
+    body.slug = finalSlug
+  }
+
   await formsCollection.updateOne(
     { id },
     {

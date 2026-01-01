@@ -40,11 +40,42 @@ export default defineEventHandler(async (event) => {
   const user = await requireAuth(event)
   const body = await readBody(event)
   
+  let slug = body.slug || body.name?.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || `form-${Date.now()}`
+  
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    throw createError({
+      statusCode: 400,
+      message: 'Slug can only contain lowercase letters, numbers, and hyphens'
+    })
+  }
+
+  const formsCollection = await collections.forms()
+  
+  let finalSlug = slug
+  let counter = 1
+  while (true) {
+    const existingForm = await formsCollection.findOne({ slug: finalSlug })
+    if (!existingForm) {
+      break
+    }
+    finalSlug = `${slug}-${counter}`
+    counter++
+    
+    if (counter > 1000) {
+      finalSlug = `${slug}-${Date.now()}`
+      break
+    }
+  }
+  
+  if (finalSlug !== slug) {
+    slug = finalSlug
+  }
+
   const form: Form = {
     id: crypto.randomUUID(),
     userId: user.id,
     name: body.name || 'Untitled Form',
-    slug: body.slug || body.name?.toLowerCase().replace(/\s+/g, '-') || `form-${Date.now()}`,
+    slug,
     fields: body.fields || [],
     settings: {
       successMessage: body.settings?.successMessage || 'Thank you for your submission!',
@@ -56,7 +87,6 @@ export default defineEventHandler(async (event) => {
     updatedAt: new Date()
   }
 
-  const formsCollection = await collections.forms()
   await formsCollection.insertOne(form)
 
   return form

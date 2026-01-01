@@ -24,7 +24,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Get OTP
   const otpsCollection = await collections.otps()
   const storedOTP = await otpsCollection.findOne({ email, type: 'password-reset' })
 
@@ -35,7 +34,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Check expiration
   if (Date.now() > storedOTP.expiresAt) {
     await removeOTP(email)
     throw createError({
@@ -44,7 +42,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Verify OTP
   if (storedOTP.code !== otp) {
     throw createError({
       statusCode: 400,
@@ -52,7 +49,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Update user password
   const usersCollection = await collections.users()
   const user = await usersCollection.findOne({ email, emailVerified: true })
 
@@ -63,10 +59,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Hash new password
   const hashedPassword = await bcrypt.hash(newPassword, 10)
 
-  // Update user
   await usersCollection.updateOne(
     { email, emailVerified: true },
     {
@@ -77,7 +71,6 @@ export default defineEventHandler(async (event) => {
     }
   )
 
-  // Remove OTP
   await removeOTP(email)
 
   return {

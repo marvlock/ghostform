@@ -24,21 +24,59 @@ try {
   })
 }
 
+async function handleSubmit(event: Event) {
+  event.preventDefault() // Only prevent if JS is available (progressive enhancement)
+  await submitForm(event)
+}
+
 async function submitForm(event: Event) {
   errors.value = {}
   errorMessage.value = ''
   
   const formElement = event.target as HTMLFormElement
-  const formDataObj = new FormData(formElement)
   const data: Record<string, any> = {}
   
-  for (const [key, value] of formDataObj.entries()) {
-    if (formElement.querySelectorAll(`[name="${key}"]:checked`).length > 0) {
-      const checked = Array.from(formElement.querySelectorAll(`[name="${key}"]:checked`)) as HTMLInputElement[]
-      data[key] = checked.length === 1 ? checked[0].value : checked.map(c => c.value)
-    } else if (formElement.querySelector(`[name="${key}"]`)) {
-      const input = formElement.querySelector(`[name="${key}"]`) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-      data[key] = input.value
+  if (form.value && form.value.fields) {
+    for (const field of form.value.fields) {
+      const fieldName = field.id
+      
+      const radioInputs = formElement.querySelectorAll(`input[name="${fieldName}"][type="radio"]`)
+      const checkboxInputs = formElement.querySelectorAll(`input[name="${fieldName}"][type="checkbox"]`)
+      
+      if (radioInputs.length > 0) {
+        const checked = Array.from(radioInputs).find((input: HTMLInputElement) => input.checked) as HTMLInputElement | undefined
+        if (checked) {
+          data[fieldName] = checked.value
+        }
+      } else if (checkboxInputs.length > 0) {
+        const checked = Array.from(checkboxInputs).filter((input: HTMLInputElement) => input.checked) as HTMLInputElement[]
+        if (checked.length > 0) {
+          data[fieldName] = checked.length === 1 ? checked[0].value : checked.map(c => c.value)
+        }
+      } else if (field.type === 'hidden') {
+        const input = formElement.querySelector(`input[name="${fieldName}"][type="hidden"]`) as HTMLInputElement | null
+        if (input) {
+          data[fieldName] = input.value
+        } else if (field.defaultValue) {
+          data[fieldName] = field.defaultValue
+        }
+      } else {
+        const input = formElement.querySelector(`[name="${fieldName}"]`) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | null
+        if (input) {
+          if (input.tagName === 'SELECT') {
+            const select = input as HTMLSelectElement
+            data[fieldName] = select.value || ''
+          } else if (input.tagName === 'TEXTAREA') {
+            const textarea = input as HTMLTextAreaElement
+            data[fieldName] = textarea.value || ''
+          } else {
+            const inputEl = input as HTMLInputElement
+            data[fieldName] = inputEl.value || ''
+          }
+        } else {
+          data[fieldName] = ''
+        }
+      }
     }
   }
   
@@ -187,7 +225,7 @@ function renderField(field) {
         <h2>{{ successMessage }}</h2>
       </div>
       
-      <form v-else :action="`/api/submit/${slug}`" method="POST" @submit.prevent="submitForm" novalidate>
+      <form v-else :action="`/api/submit/${slug}`" method="POST" @submit="handleSubmit" novalidate>
         <h1>{{ form.name }}</h1>
         
         <div v-if="errorMessage" class="error-message-global">
@@ -200,7 +238,7 @@ function renderField(field) {
             <span v-if="field.required" class="required">*</span>
           </label>
           
-          <div v-html="renderField(field)"></div>
+          <div v-html="renderField(field)" :key="`field-${field.id}-${errors[field.id] ? 'error' : 'normal'}`"></div>
           
           <div v-if="field.description" class="field-description" v-html="field.description"></div>
           

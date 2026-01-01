@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { isAuthenticated, checkAuth } = useAuth()
+const { isAuthenticated, checkAuth, loading: authLoading } = useAuth()
 const route = useRoute()
 const slug = route.params.slug as string
 
@@ -10,8 +10,19 @@ const error = ref('')
 
 await checkAuth()
 
-if (!isAuthenticated.value) {
-  await navigateTo('/login')
+if (process.client) {
+  onMounted(async () => {
+    if (!isAuthenticated.value) {
+      await checkAuth()
+      if (!isAuthenticated.value) {
+        await navigateTo('/login')
+      }
+    }
+  })
+} else {
+  if (!isAuthenticated.value) {
+    await navigateTo('/login')
+  }
 }
 
 try {
@@ -118,9 +129,6 @@ function getFieldLabel(fieldId: string) {
             <div class="submission-field">
               <div class="field-value" style="color: var(--text-secondary); font-style: italic;">
                 No data available
-                <div style="font-size: 12px; margin-top: 8px; opacity: 0.7;">
-                  Debug: submission.data = {{ JSON.stringify(submission.data) }}
-                </div>
               </div>
             </div>
           </div>

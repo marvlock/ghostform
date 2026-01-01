@@ -37,7 +37,23 @@ export async function connectDB(): Promise<Db> {
 
 export async function getCollection(name: string) {
   const database = await connectDB()
-  return database.collection(name)
+  const collection = database.collection(name)
+  
+  if (name === 'forms') {
+    try {
+      await collection.createIndex({ slug: 1 }, { unique: true })
+    } catch (error) {
+    }
+  }
+  
+  if (name === 'submissions') {
+    try {
+      await collection.createIndex({ formSlug: 1, clientIP: 1, createdAt: -1 })
+    } catch (error) {
+    }
+  }
+  
+  return collection
 }
 
 export const collections = {

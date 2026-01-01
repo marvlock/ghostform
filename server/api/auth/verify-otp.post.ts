@@ -31,7 +31,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Get OTP
   const otpsCollection = await collections.otps()
   const storedOTP = await otpsCollection.findOne({ email, type: 'signup' })
 
@@ -42,7 +41,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Check expiration
   if (Date.now() > storedOTP.expiresAt) {
     await removeOTP(email)
     throw createError({
@@ -51,7 +49,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Verify OTP
   if (storedOTP.code !== otp) {
     throw createError({
       statusCode: 400,
@@ -59,7 +56,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Get pending user
   const usersCollection = await collections.users()
   const pendingUser = await usersCollection.findOne({ email, pending: true })
 
@@ -70,7 +66,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Create user account
   const newUser = {
     id: crypto.randomUUID(),
     email: pendingUser.email,
@@ -82,19 +77,18 @@ export default defineEventHandler(async (event) => {
 
   await usersCollection.insertOne(newUser)
 
-  // Remove pending user and OTP
   await usersCollection.deleteOne({ email, pending: true })
   await removeOTP(email)
 
-  // Create session
   const sessionId = crypto.randomUUID()
   await saveSession(sessionId, newUser.id)
 
   setCookie(event, 'session', sessionId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 60 * 60 * 24 * 30 // 30 days
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+    path: '/'
   })
 
   return {
