@@ -52,4 +52,8 @@ pnpm preview
 
 ## License
 
-Open source - see [GitHub repository](https://github.com/marvlock/ghostform)
+MIT License - see [LICENSE](LICENSE) file for details.
+
+---
+
+A project by [Project Marvlock](https://www.marvlock.dev/) | [GitHub](https://github.com/marvlock/ghostform)
