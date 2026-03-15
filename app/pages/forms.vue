@@ -38,6 +38,7 @@ try {
     await navigateTo('/login')
   } else {
     console.error('Error loading forms:', error)
+    showNotification(error.data?.message || 'Failed to load forms', 'error')
   }
 } finally {
   loading.value = false
@@ -45,7 +46,7 @@ try {
 
 function formatDate(dateString) {
   const date = new Date(dateString)
-  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 function formUrl(slug: string) {
@@ -60,10 +61,12 @@ async function copyFormLink(slug: string) {
   try {
     await navigator.clipboard.writeText(url)
     copiedSlug.value = slug
+    showNotification('Link copied to clipboard')
     setTimeout(() => {
       copiedSlug.value = null
     }, 2000)
   } catch (err) {
+    // Fallback
     const textArea = document.createElement('textarea')
     textArea.value = url
     document.body.appendChild(textArea)
@@ -97,7 +100,7 @@ async function copyEmbedCode(type: 'html' | 'iframe', slug: string) {
     await navigator.clipboard.writeText(codeToCopy)
     copiedEmbedSlug.value = slug
     copiedEmbedType.value = type
-    showNotification(`${type === 'html' ? 'HTML' : 'iframe'} code copied to clipboard!`, 'success')
+    showNotification(`${type === 'html' ? 'HTML' : 'iframe'} code copied!`, 'success')
     setTimeout(() => {
       copiedEmbedSlug.value = null
       copiedEmbedType.value = null
@@ -125,8 +128,9 @@ async function toggleFormStatus(form: any) {
     if (formIndex !== -1) {
       forms.value[formIndex] = updatedForm
     }
+    showNotification(updatedForm.settings.enabled ? 'Form enabled' : 'Form disabled')
   } catch (error: any) {
-    showNotification(error.data?.message || 'Failed to update form status', 'error')
+    showNotification(error.data?.message || 'Failed to update', 'error')
     const formIndex = forms.value.findIndex((f: any) => f.id === form.id)
     if (formIndex !== -1) {
       forms.value[formIndex].settings.enabled = form.settings.enabled
@@ -161,8 +165,7 @@ async function handleDeleteForm() {
     formToDelete.value = null
     showNotification('Form deleted successfully', 'success')
   } catch (error: any) {
-    console.error('Error deleting form:', error)
-    showNotification(error.data?.message || 'Failed to delete form', 'error')
+    showNotification(error.data?.message || 'Failed to delete', 'error')
   } finally {
     deletingFormId.value = null
   }
@@ -173,203 +176,139 @@ async function handleDeleteForm() {
   <div class="forms-page">
     <div class="container">
       <div class="page-header">
-        <h1>My Forms</h1>
+        <div class="header-content">
+          <h1 class="page-title">My Forms</h1>
+          <p class="page-subtitle">Manage your privacy-first forms and endpoints.</p>
+        </div>
         <NuxtLink to="/builder" class="btn btn-primary">Create New Form</NuxtLink>
       </div>
 
-      <div v-if="loading" class="loading">
-        Loading forms...
+      <div v-if="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Fetching your forms...</p>
       </div>
 
       <div v-else-if="forms.length === 0" class="empty-state">
-        <p>No forms yet. Create your first form to get started.</p>
-        <NuxtLink to="/builder" class="btn btn-primary">Create Form</NuxtLink>
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2v20M2 12h20" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2>No forms yet</h2>
+        <p>Create your first secure form and start collecting data today.</p>
+        <NuxtLink to="/builder" class="btn btn-primary">Get Started</NuxtLink>
       </div>
 
       <div v-else class="forms-grid">
         <div v-for="form in forms" :key="form.id" class="form-card">
-          <div class="form-card-header">
-            <h3>{{ form.name }}</h3>
-            <div class="form-status-controls">
-              <label class="toggle-switch">
-                <input 
-                  type="checkbox" 
-                  :checked="form.settings.enabled"
-                  @change="toggleFormStatus(form)"
-                  :disabled="updatingForms.has(form.id)"
-                />
-                <span class="toggle-slider"></span>
-              </label>
-              <span :class="['status-badge', form.settings.enabled ? 'enabled' : 'disabled']">
-                {{ form.settings.enabled ? 'Enabled' : 'Disabled' }}
-              </span>
-            </div>
-          </div>
-          <div class="form-card-body">
-            <div class="form-slug-container">
-              <p class="form-slug">{{ formUrl(form.slug) }}</p>
-              <div class="form-actions-inline">
-                <button @click="copyFormLink(form.slug)" class="copy-link-btn" :title="copiedSlug === form.slug ? 'Copied!' : 'Copy link'">
-                  <svg v-if="copiedSlug !== form.slug" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M5.5 4.5V3.5C5.5 2.67 6.17 2 7 2H12.5C13.33 2 14 2.67 14 3.5V9C14 9.83 13.33 10.5 12.5 10.5H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M3.5 5.5H10.5C11.33 5.5 12 6.17 12 7V12.5C12 13.33 11.33 14 10.5 14H3.5C2.67 14 2 13.33 2 12.5V7C2 6.17 2.67 5.5 3.5 5.5Z" stroke="currentColor" stroke-width="1.5"/>
-                  </svg>
-                  <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </button>
-                <button @click="showEmbedOptions(form.slug)" class="copy-link-btn" title="Embed form">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M5.5 2.5H3.5C2.67 2.5 2 3.17 2 4V12.5C2 13.33 2.67 14 3.5 14H12C12.83 14 13.5 13.33 13.5 12.5V10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M10.5 2.5H13.5C14.33 2.5 15 3.17 15 4V6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M9.5 7.5L13.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    <path d="M13.5 3.5H10.5V6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  </svg>
-                </button>
+          <div class="card-top">
+            <div class="card-info">
+              <h3 class="form-name">{{ form.name }}</h3>
+              <div class="form-meta">
+                <span class="meta-item">{{ form.fields?.length || 0 }} fields</span>
+                <span class="meta-dot"></span>
+                <span class="meta-item">Created {{ formatDate(form.createdAt) }}</span>
               </div>
             </div>
-            <p class="form-meta">{{ form.fields?.length || 0 }} fields</p>
-            <p class="form-date">Created {{ formatDate(form.createdAt) }}</p>
+            <div class="card-status">
+              <button 
+                @click="toggleFormStatus(form)" 
+                class="status-toggle"
+                :class="{ 'is-enabled': form.settings.enabled }"
+                :disabled="updatingForms.has(form.id)"
+              >
+                <div class="toggle-dot"></div>
+                {{ form.settings.enabled ? 'Live' : 'Paused' }}
+              </button>
+            </div>
           </div>
-          <div class="form-card-actions">
-            <NuxtLink :to="`/form/${form.slug}`" class="btn btn-secondary btn-small" target="_blank">View</NuxtLink>
-            <NuxtLink :to="`/submissions/${form.slug}`" class="btn btn-secondary btn-small btn-submissions">Submissions</NuxtLink>
-            <NuxtLink :to="`/builder?id=${form.id}`" class="btn btn-primary btn-small">Edit</NuxtLink>
-            <button 
-              @click="confirmDelete(form)" 
-              class="btn btn-danger btn-small"
-              :disabled="deletingFormId === form.id"
-            >
-              Delete
+
+          <div class="card-url">
+            <code>{{ form.slug }}</code>
+            <button @click="copyFormLink(form.slug)" class="icon-btn" title="Copy URL">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+              </svg>
             </button>
+          </div>
+
+          <div class="card-actions">
+            <div class="action-group action-group-main">
+              <NuxtLink :to="`/submissions/${form.slug}`" class="btn btn-subtle">
+                Submissions
+              </NuxtLink>
+              <button @click="showEmbedOptions(form.slug)" class="btn btn-subtle">
+                Embed
+              </button>
+            </div>
+            <div class="action-group action-group-icons">
+              <NuxtLink :to="`/builder?id=${form.id}`" class="btn btn-outline" title="Edit Form">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                </svg>
+              </NuxtLink>
+              <button @click="confirmDelete(form)" class="btn btn-outline-danger" title="Delete Form">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    
-    <!-- Delete Form Confirmation Modal -->
+
+    <!-- Modals & Notifications -->
     <div v-if="showDeleteConfirm" class="modal-overlay" @click.self="showDeleteConfirm = false">
       <div class="modal-content">
         <h3 class="modal-title">Delete Form</h3>
-        <p class="modal-description">Are you sure you want to delete "{{ formToDelete?.name }}"?</p>
-        <div class="modal-warning">
-          <p>This action is irreversible and will permanently delete:</p>
-          <ul>
-            <li>The form and all its fields</li>
-            <li>All form submissions</li>
-            <li>The form's shareable link</li>
-          </ul>
-        </div>
+        <p class="modal-description">Are you sure you want to delete "{{ formToDelete?.name }}"? This will permanently remove all submissions.</p>
         <div class="modal-actions">
-          <button @click="showDeleteConfirm = false; formToDelete = null" class="btn btn-secondary">Cancel</button>
+          <button @click="showDeleteConfirm = false" class="btn btn-subtle">Cancel</button>
           <button @click="handleDeleteForm" class="btn btn-danger" :disabled="deletingFormId !== null">
-            {{ deletingFormId ? 'Deleting...' : 'Delete Form' }}
+            {{ deletingFormId ? 'Deleting...' : 'Confirm' }}
           </button>
         </div>
       </div>
     </div>
-    
-    <div v-if="notification.show" class="notification-overlay" @click="notification.show = false">
-      <div class="notification-modal" :class="notification.type" @click.stop>
-        <div class="notification-icon">
-          <svg v-if="notification.type === 'success'" width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <p class="notification-message">{{ notification.message }}</p>
-        <button @click="notification.show = false" class="notification-close">OK</button>
-      </div>
-    </div>
 
-    <!-- Embed Options Modal -->
+    <!-- Embed Modal -->
     <div v-if="showEmbedModal && embedOptions" class="modal-overlay" @click.self="showEmbedModal = false">
       <div class="modal-content embed-modal">
         <div class="modal-header">
-          <h3 class="modal-title">Embed Form</h3>
-          <button @click="showEmbedModal = false; embedOptions = null; embedFormSlug = null" class="modal-close-btn">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </button>
+          <h3 class="modal-title">Embed Options</h3>
+          <button @click="showEmbedModal = false" class="close-btn">&times;</button>
         </div>
         
-        <div class="embed-options">
-          <!-- Option 1: Full HTML Embed -->
-          <div class="embed-option">
-            <div class="embed-option-header">
-              <h4>Full HTML Embed</h4>
-              <p class="embed-option-desc">Copy and paste the complete HTML form with all styles. Works everywhere, full control.</p>
+        <div class="embed-list">
+          <div class="embed-item">
+            <div class="embed-top">
+              <div class="embed-label">
+                <strong>HTML Snippet</strong>
+                <span>Full control, works everywhere.</span>
+              </div>
+              <button @click="copyEmbedCode('html', embedFormSlug!)" class="btn btn-primary btn-sm">Copy Code</button>
             </div>
-            <div class="embed-code-container">
-              <pre class="embed-code"><code>{{ embedOptions.html.substring(0, 200) }}...</code></pre>
-            </div>
-            <button 
-              @click="copyEmbedCode('html', embedFormSlug!)" 
-              class="btn btn-primary btn-small"
-            >
-              <svg v-if="copiedEmbedSlug !== embedFormSlug || copiedEmbedType !== 'html'" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M5.5 4.5V3.5C5.5 2.67 6.17 2 7 2H12.5C13.33 2 14 2.67 14 3.5V9C14 9.83 13.33 10.5 12.5 10.5H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M3.5 5.5H10.5C11.33 5.5 12 6.17 12 7V12.5C12 13.33 11.33 14 10.5 14H3.5C2.67 14 2 13.33 2 12.5V7C2 6.17 2.67 5.5 3.5 5.5Z" stroke="currentColor" stroke-width="1.5"/>
-              </svg>
-              <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              {{ copiedEmbedSlug === embedFormSlug && copiedEmbedType === 'html' ? 'Copied!' : 'Copy HTML' }}
-            </button>
+            <pre class="embed-code"><code>{{ embedOptions.html }}</code></pre>
           </div>
-
-          <!-- Option 2: iframe Embed -->
-          <div class="embed-option">
-            <div class="embed-option-header">
-              <h4>iframe Embed (One-liner)</h4>
-              <p class="embed-option-desc">Simple one-line code. Works without JavaScript. Best for quick embeds.</p>
+          <div class="embed-item">
+            <div class="embed-top">
+              <div class="embed-label">
+                <strong>iframe Embed</strong>
+                <span>One-liner, no styling needed.</span>
+              </div>
+              <button @click="copyEmbedCode('iframe', embedFormSlug!)" class="btn btn-primary btn-sm">Copy Code</button>
             </div>
-            <div class="embed-code-container">
-              <pre class="embed-code"><code>{{ embedOptions.iframe }}</code></pre>
-            </div>
-            <button 
-              @click="copyEmbedCode('iframe', embedFormSlug!)" 
-              class="btn btn-primary btn-small"
-            >
-              <svg v-if="copiedEmbedSlug !== embedFormSlug || copiedEmbedType !== 'iframe'" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M5.5 4.5V3.5C5.5 2.67 6.17 2 7 2H12.5C13.33 2 14 2.67 14 3.5V9C14 9.83 13.33 10.5 12.5 10.5H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M3.5 5.5H10.5C11.33 5.5 12 6.17 12 7V12.5C12 13.33 11.33 14 10.5 14H3.5C2.67 14 2 13.33 2 12.5V7C2 6.17 2.67 5.5 3.5 5.5Z" stroke="currentColor" stroke-width="1.5"/>
-              </svg>
-              <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              {{ copiedEmbedSlug === embedFormSlug && copiedEmbedType === 'iframe' ? 'Copied!' : 'Copy iframe' }}
-            </button>
-          </div>
-
-          <!-- Option 3: Direct Link -->
-          <div class="embed-option">
-            <div class="embed-option-header">
-              <h4>Direct Link</h4>
-              <p class="embed-option-desc">Share this link directly or use it in your own HTML.</p>
-            </div>
-            <div class="embed-code-container">
-              <pre class="embed-code"><code>{{ embedOptions.directUrl }}</code></pre>
-            </div>
-            <button 
-              @click="copyFormLink(embedFormSlug!)" 
-              class="btn btn-primary btn-small"
-            >
-              <svg v-if="copiedSlug !== embedFormSlug" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M5.5 4.5V3.5C5.5 2.67 6.17 2 7 2H12.5C13.33 2 14 2.67 14 3.5V9C14 9.83 13.33 10.5 12.5 10.5H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M3.5 5.5H10.5C11.33 5.5 12 6.17 12 7V12.5C12 13.33 11.33 14 10.5 14H3.5C2.67 14 2 13.33 2 12.5V7C2 6.17 2.67 5.5 3.5 5.5Z" stroke="currentColor" stroke-width="1.5"/>
-              </svg>
-              <svg v-else width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M13.5 4.5L6 12L2.5 8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              {{ copiedSlug === embedFormSlug ? 'Copied!' : 'Copy Link' }}
-            </button>
+            <pre class="embed-code"><code>{{ embedOptions.iframe }}</code></pre>
           </div>
         </div>
       </div>
+    </div>
+
+    <div v-if="notification.show" class="notification-toast" :class="notification.type">
+      {{ notification.message }}
     </div>
   </div>
 </template>
@@ -377,221 +316,258 @@ async function handleDeleteForm() {
 <style scoped>
 .forms-page {
   min-height: 100vh;
-  padding: 40px 0;
-  background-color: var(--bg-color);
+  padding: 112px 0 80px;
+  background-color: #fcfcfd;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 40px;
+@media (max-width: 768px) {
+  .forms-page {
+    padding: 96px 0 64px;
+  }
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 48px;
+  align-items: flex-end;
+  margin-bottom: 64px;
 }
 
-h1 {
-  font-size: 48px;
-  font-weight: 800;
-  color: var(--text-color);
+@media (max-width: 768px) {
+  .page-header { flex-direction: column; align-items: flex-start; gap: 24px; }
 }
 
-.loading {
+.page-title {
+  font-family: "Playfair Display", serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  color: #6b6b80;
+  font-size: 16px;
+}
+
+/* ─── State Styles ────────────────────────────────────────── */
+.loading-state {
   text-align: center;
-  padding: 60px 0;
-  color: var(--text-secondary);
+  padding: 100px 0;
 }
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f0f0f2;
+  border-top-color: #000;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
 
 .empty-state {
   text-align: center;
-  padding: 80px 0;
+  padding: 120px 40px;
+  background: white;
+  border: 1px dashed #e8e8ec;
+  border-radius: 24px;
+}
+
+.empty-icon {
+  margin-bottom: 24px;
+  color: #e8e8ec;
+}
+
+.empty-state h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
 }
 
 .empty-state p {
-  font-size: 18px;
-  color: var(--text-secondary);
-  margin-bottom: 24px;
+  color: #6b6b80;
+  margin-bottom: 32px;
 }
 
+/* ─── Forms Grid ───────────────────────────────────────────── */
 .forms-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 24px;
 }
 
+@media (max-width: 480px) {
+  .forms-grid { grid-template-columns: 1fr; }
+}
+
 .form-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
+  background: white;
+  border: 1px solid #e8e8ec;
+  border-radius: 20px;
   padding: 24px;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
 }
 
 .form-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--accent-color);
+  border-color: #000;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
 }
 
-.form-card-header {
+.card-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
-.form-card-header h3 {
+.form-name {
   font-size: 20px;
   font-weight: 700;
-  color: var(--text-color);
-  margin: 0;
+  color: #000;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
 }
 
-.form-status-controls {
+.form-meta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  color: #6b6b80;
+  font-size: 13px;
 }
 
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
+.meta-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #e0e0e0;
+}
+
+.status-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 100px;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-}
-
-.status-badge.enabled {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
-}
-
-.status-badge.disabled {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-.toggle-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(239, 68, 68, 0.3);
-  transition: 0.2s;
-  border-radius: 24px;
-}
-
-.toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.2s;
-  border-radius: 50%;
-}
-
-.toggle-switch input:checked + .toggle-slider {
-  background-color: rgba(34, 197, 94, 0.5);
-}
-
-.toggle-switch input:checked + .toggle-slider:before {
-  transform: translateX(20px);
-}
-
-.toggle-switch input:disabled + .toggle-slider {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.form-card-body {
-  margin-bottom: 20px;
-}
-
-.form-slug-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.form-actions-inline {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.form-slug {
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
-  color: var(--accent-color);
-  margin: 0;
-  flex: 1;
-  word-break: break-all;
-}
-
-.copy-link-btn {
-  background: transparent;
+  background: #f4f4f5;
+  color: #71717a;
   border: none;
-  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.status-toggle.is-enabled {
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.toggle-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.card-url {
+  background: #f9f9fb;
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.card-url code {
+  font-family: monospace;
+  font-size: 13px;
+  color: #000;
+  opacity: 0.7;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: #6b6b80;
   cursor: pointer;
   padding: 4px;
+  border-radius: 6px;
+}
+
+.icon-btn:hover { color: #000; background: #e8e8ec; }
+
+.card-actions {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s;
-  flex-shrink: 0;
+  gap: 12px;
+  margin-top: auto;
 }
 
-.copy-link-btn:hover {
-  color: var(--accent-color);
-  background: rgba(139, 92, 246, 0.1);
-}
-
-.form-meta {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
-}
-
-.form-date {
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.form-card-actions {
+.action-group {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 10px;
 }
 
+.action-group-main {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+}
+
+.action-group-main .btn {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 16px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+
+.action-group-icons {
+  display: flex;
+  align-items: center;
+}
+
+.action-group-icons .btn-outline,
+.action-group-icons .btn-outline-danger {
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border-radius: 14px;
+  flex: 0 0 52px;
+}
+
+@media (max-width: 560px) {
+  .card-actions {
+    flex-wrap: wrap;
+  }
+
+  .action-group-main {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .action-group-icons {
+    justify-content: flex-end;
+    width: 100%;
+  }
+}
+
+/* ─── Unified Buttons ───────────────────────────────────────── */
 .btn {
   padding: 10px 20px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-weight: 600;
   font-size: 14px;
   text-decoration: none;
@@ -601,353 +577,138 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-family: inherit;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  color: white;
-  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.4);
+.btn-primary { background: #000; color: #fff; }
+.btn-primary:hover { background: #1f1f2e; transform: translateY(-1px); }
+
+.btn-subtle { background: #f4f4f5; color: #18181b; }
+.btn-subtle:hover { background: #e4e4e7; }
+
+.btn-outline { background: transparent; border: 1.5px solid #e8e8ec; color: #000; padding: 10px; }
+.btn-outline:hover { border-color: #000; background: #fcfcfd; }
+
+.btn-outline-danger { background: transparent; border: 1.5px solid #fff1f2; color: #e11d48; padding: 10px; }
+.btn-outline-danger:hover { background: #fff1f2; border-color: #fda4af; }
+
+.btn-danger { background: #e11d48; color: #fff; }
+.btn-danger:hover { background: #be123c; }
+
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+
+/* ─── Modals ───────────────────────────────────────────────── */
+.modal-title {
+  font-family: "Playfair Display", serif;
+  font-size: 24px;
+  margin-bottom: 12px;
 }
 
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px 0 rgba(139, 92, 246, 0.5);
-}
+.embed-modal { max-width: 600px; }
 
-.btn-secondary {
-  background: transparent;
-  color: var(--text-color);
-  border: 2px solid var(--border-color);
-}
+.embed-list { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
 
-.btn-secondary:hover {
-  border-color: var(--accent-color);
-  color: var(--accent-color);
-}
-
-.btn-danger {
-  background: transparent;
-  color: #ef4444;
-  border: 2px solid #ef4444;
-}
-
-.btn-danger:hover {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: #ef4444;
-  color: #ef4444;
-}
-
-.btn-danger:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-small {
-  padding: 8px 12px;
-  font-size: 13px;
-  flex: 1;
-  min-width: 0;
-  white-space: nowrap;
-  text-align: center;
-}
-
-.btn-submissions {
-  flex: 1.4;
-  min-width: 100px;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100vw;
-  height: 100vh;
-  min-height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+.embed-item {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  padding: 20px;
-  box-sizing: border-box;
-  overflow-y: auto;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 16px;
+  background: #f9f9fb;
+  border-radius: 12px;
 }
 
-.modal-content {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 32px;
-  max-width: 480px;
-  width: 100%;
-  box-shadow: var(--shadow-lg);
-  margin: auto;
-  flex-shrink: 0;
-}
-
-.embed-modal {
-  max-width: 800px;
-}
-
-.modal-header {
+.embed-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  gap: 16px;
 }
 
-.modal-close-btn {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  transition: all 0.2s;
-}
-
-.modal-close-btn:hover {
-  background: var(--section-bg);
-  color: var(--text-color);
-}
-
-.embed-options {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.embed-option {
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 20px;
-  background: var(--section-bg);
-}
-
-.embed-option-header h4 {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-color);
-  margin: 0 0 8px 0;
-}
-
-.embed-option-desc {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin: 0 0 16px 0;
-  line-height: 1.5;
-}
-
-.embed-code-container {
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 12px;
-  overflow-x: auto;
-}
+.embed-label strong { display: block; font-size: 14px; margin-bottom: 2px; }
+.embed-label span { font-size: 12px; color: #6b6b80; }
 
 .embed-code {
   margin: 0;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
-  font-size: 13px;
-  color: var(--text-color);
-  white-space: pre-wrap;
-  word-break: break-all;
+  padding: 12px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e8e8ec;
+  color: #111827;
+  font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", monospace;
+  font-size: 12px;
   line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 180px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af #f3f4f6;
 }
 
-.embed-code code {
-  font-family: inherit;
-  font-size: inherit;
-  color: inherit;
+.embed-code::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-.modal-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-color);
-  margin-bottom: 12px;
-  letter-spacing: -0.02em;
+.embed-code::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 999px;
 }
 
-.modal-description {
-  color: var(--text-secondary);
-  font-size: 15px;
-  line-height: 1.6;
-  margin-bottom: 24px;
+.embed-code::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #9ca3af 0%, #6b7280 100%);
+  border-radius: 999px;
+  border: 2px solid #f3f4f6;
 }
 
-.modal-warning {
-  background: var(--section-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 24px;
-}
-
-.modal-warning p {
-  color: var(--text-color);
-  font-weight: 600;
-  margin-bottom: 12px;
-  font-size: 14px;
-}
-
-.modal-warning ul {
-  margin: 0;
-  padding-left: 20px;
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.modal-warning li {
-  margin-bottom: 8px;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
-.modal-actions .btn-danger {
-  background: #ef4444;
-  color: white;
-  border-color: #ef4444;
-}
-
-.modal-actions .btn-danger:hover {
-  background: #dc2626;
-  border-color: #dc2626;
-  color: white;
+.embed-code::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #6b7280 0%, #4b5563 100%);
 }
 
 @media (max-width: 768px) {
-  .page-header {
+  .embed-top {
     flex-direction: column;
     align-items: flex-start;
-    gap: 20px;
-  }
-
-  .forms-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .notification-modal {
-    padding: 24px;
   }
 }
 
-.notification-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  padding: 20px;
-  animation: fadeIn 0.2s ease-out;
-}
-
-.notification-modal {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 32px;
-  max-width: 400px;
-  width: 100%;
-  box-shadow: var(--shadow-lg);
-  text-align: center;
-  animation: slideUp 0.3s ease-out;
-}
-
-.notification-modal.success {
-  border-color: #22c55e;
-}
-
-.notification-modal.error {
-  border-color: #ef4444;
-}
-
-.notification-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  background: rgba(139, 92, 246, 0.1);
-  color: var(--accent-color);
-}
-
-.notification-modal.success .notification-icon {
-  background: rgba(34, 197, 94, 0.1);
-  color: #22c55e;
-}
-
-.notification-modal.error .notification-icon {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
-.notification-message {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text-color);
-  margin-bottom: 24px;
-  line-height: 1.5;
-}
-
-.notification-close {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  color: white;
+.close-btn {
+  background: none;
   border: none;
-  padding: 12px 32px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 15px;
+  font-size: 24px;
   cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.4);
+  color: #6b6b80;
 }
 
-.notification-close:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px 0 rgba(139, 92, 246, 0.5);
+.modal-header { display: flex; justify-content: space-between; align-items: center; }
+
+/* ─── Notification ─────────────────────────────────────────── */
+.notification-toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  padding: 14px 24px;
+  background: #000;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  animation: slideIn 0.3s ease-out;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.notification-toast.success {
+  background: #000;
+  color: #fff;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.notification-toast.error {
+  background: #7f1d1d;
+  color: #fff;
+  box-shadow: 0 10px 40px rgba(127, 29, 29, 0.35);
 }
+
+@keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 </style>
-

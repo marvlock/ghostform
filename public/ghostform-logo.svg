@@ -1,0 +1,27 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="GhostForm logo">
+  <defs>
+    <linearGradient id="bg" x1="64" y1="56" x2="448" y2="456" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="1" stop-color="#1F2937"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="160" y1="120" x2="356" y2="392" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="140" y1="132" x2="372" y2="388" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#A5F3FC" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#60A5FA" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="40" y="40" width="432" height="432" rx="108" fill="url(#bg)"/>
+
+  <path d="M256 102L366 158V252C366 331 310 389 256 410C202 389 146 331 146 252V158L256 102Z" fill="url(#accent)"/>
+  <path d="M256 132L338 174V252C338 315 296 363 256 382C216 363 174 315 174 252V174L256 132Z" fill="#0B1020" fill-opacity="0.92"/>
+
+  <rect x="226" y="222" width="60" height="54" rx="12" fill="url(#glow)"/>
+  <path d="M208 222V204C208 177 229 156 256 156C283 156 304 177 304 204V222" stroke="#67E8F9" stroke-width="20" stroke-linecap="round"/>
+
+  <circle cx="256" cy="250" r="8" fill="#0F172A"/>
+  <path d="M256 258V274" stroke="#0F172A" stroke-width="8" stroke-linecap="round"/>
+</svg>

@@ -25,7 +25,7 @@ try {
 }
 
 async function handleSubmit(event: Event) {
-  event.preventDefault() // Only prevent if JS is available (progressive enhancement)
+  event.preventDefault()
   await submitForm(event)
 }
 
@@ -133,11 +133,11 @@ function renderField(field) {
         name="${field.id}" 
         ${field.required ? 'required' : ''}
         class="${hasError ? 'error' : ''}"
-      ><option value="">Select...</option>${options}</select>`
+      ><option value="">Select option...</option>${options}</select>`
       break
       
     case 'checkbox':
-      fieldHtml = `<label><input 
+      fieldHtml = `<label class="checkbox-wrapper"><input 
         type="checkbox" 
         id="${fieldId}" 
         name="${field.id}" 
@@ -145,12 +145,12 @@ function renderField(field) {
         ${field.required ? 'required' : ''}
         ${field.defaultValue === 'true' ? 'checked' : ''}
         class="${hasError ? 'error' : ''}"
-      /> ${field.label}</label>`
+      /> <span class="checkbox-text">${field.label}</span></label>`
       break
       
     case 'radio':
       const radioOptions = field.options?.map((opt, idx) => 
-        `<label><input 
+        `<label class="radio-wrapper"><input 
           type="radio" 
           id="${fieldId}-${idx}" 
           name="${field.id}" 
@@ -158,9 +158,9 @@ function renderField(field) {
           ${field.required ? 'required' : ''}
           ${field.defaultValue === opt ? 'checked' : ''}
           class="${hasError ? 'error' : ''}"
-        /> ${opt}</label>`
+        /> <span class="radio-text">${opt}</span></label>`
       ).join('') || ''
-      fieldHtml = radioOptions
+      fieldHtml = `<div class="radio-group">${radioOptions}</div>`
       break
       
     case 'hidden':
@@ -219,259 +219,301 @@ function renderField(field) {
 </script>
 
 <template>
-  <div class="form-page">
-    <div class="container">
-      <div v-if="submitted" class="success-message">
-        <h2>{{ successMessage }}</h2>
+  <div class="form-viewer">
+    <div class="container container-narrow">
+      <div v-if="submitted" class="success-screen">
+        <div class="success-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20 6L9 17L4 12" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 class="success-title">{{ successMessage }}</h2>
+        <p class="success-desc">Data successfully secured and processed.</p>
       </div>
       
-      <form v-else :action="`/api/submit/${slug}`" method="POST" @submit="handleSubmit" novalidate>
-        <h1>{{ form.name }}</h1>
+      <form v-else :action="`/api/submit/${slug}`" method="POST" @submit="handleSubmit" novalidate class="public-form">
+        <header class="form-header">
+          <h1 class="form-title">{{ form.name }}</h1>
+          <div class="security-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+            End-to-End Encrypted
+          </div>
+        </header>
         
-        <div v-if="errorMessage" class="error-message-global">
+        <div v-if="errorMessage" class="error-banner">
           {{ errorMessage }}
         </div>
         
-        <div v-for="field in form.fields" :key="field.id" class="form-field">
-          <label v-if="field.type !== 'checkbox' && field.type !== 'radio' && field.type !== 'hidden'" :for="`field-${field.id}`">
-            {{ field.label }}
-            <span v-if="field.required" class="required">*</span>
-          </label>
-          
-          <div v-html="renderField(field)" :key="`field-${field.id}-${errors[field.id] ? 'error' : 'normal'}`"></div>
-          
-          <div v-if="field.description" class="field-description" v-html="field.description"></div>
-          
-          <div v-if="errors[field.id]" class="error-message">
-            {{ errors[field.id] }}
+        <div class="fields-container">
+          <div v-for="field in form.fields" :key="field.id" class="form-field-item">
+            <label v-if="field.type !== 'checkbox' && field.type !== 'radio' && field.type !== 'hidden'" :for="`field-${field.id}`" class="field-label">
+              {{ field.label }}
+              <span v-if="field.required" class="required-mark">*</span>
+            </label>
+            
+            <div v-html="renderField(field)" class="field-rendering"></div>
+            
+            <div v-if="field.description" class="field-hint" v-html="field.description"></div>
+            
+            <div v-if="errors[field.id]" class="field-error-msg">
+              {{ errors[field.id] }}
+            </div>
           </div>
         </div>
         
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn-submit">Submit Declaration</button>
       </form>
+      
+      <footer class="viewer-footer">
+        <NuxtLink to="/" class="powered-by">
+          <img src="/ghostform-logo.svg" alt="GhostForm" class="powered-by-logo" />
+          Powered by <span>GhostForm</span>
+        </NuxtLink>
+      </footer>
     </div>
   </div>
 </template>
 
 <style>
-.form-page {
+.form-viewer {
   min-height: 100vh;
-  padding: 80px 0;
-  background-color: var(--bg-color);
+  padding: 100px 0;
+  background-color: #fcfcfd;
+  color: #000;
 }
 
-.form-page .container {
-  max-width: 800px;
+.container-narrow {
+  max-width: 640px;
   margin: 0 auto;
-  padding: 0 40px;
 }
 
-.form-page h1 {
-  font-size: 42px;
-  font-weight: 800;
+.powered-by-logo {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  vertical-align: text-bottom;
+  margin-right: 8px;
+}
+
+.public-form {
+  background: white;
+  border: 1px solid #e8e8ec;
+  border-radius: 24px;
+  padding: 56px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.02);
+}
+
+@media (max-width: 480px) {
+  .public-form { padding: 32px 24px; }
+}
+
+.form-header {
   margin-bottom: 48px;
-  color: var(--text-color);
-}
-
-.form-page form {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 48px;
-}
-
-.form-field {
-  margin-bottom: 32px;
-}
-
-label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: var(--text-color);
-  font-size: 16px;
-}
-
-.required {
-  color: #ef4444;
-}
-
-.form-page input[type="text"],
-.form-page input[type="email"],
-.form-page input[type="number"],
-.form-page textarea {
-  width: 100%;
-  padding: 14px 16px;
-  border: 2px solid var(--border-color);
-  border-radius: 10px;
-  font-size: 16px;
-  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg-color);
-  color: var(--text-color);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-sizing: border-box;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.form-page select,
-.form-page form select {
-  width: 100%;
-  padding: 14px 40px 14px 16px;
-  border: 2px solid var(--border-color);
-  border-radius: 10px;
-  font-size: 16px;
-  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg-color);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b5f7a' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-  color: var(--text-color);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-sizing: border-box;
-  -webkit-appearance: none;
-  appearance: none;
-  cursor: pointer;
-}
-
-.form-page input[type="text"]:hover,
-.form-page input[type="email"]:hover,
-.form-page input[type="number"]:hover,
-.form-page textarea:hover,
-.form-page select:hover,
-.form-page form input[type="text"]:hover,
-.form-page form input[type="email"]:hover,
-.form-page form input[type="number"]:hover,
-.form-page form textarea:hover,
-.form-page form select:hover {
-  border-color: var(--accent-color);
-}
-
-.form-page input:focus,
-.form-page textarea:focus,
-.form-page select:focus,
-.form-page form input:focus,
-.form-page form textarea:focus,
-.form-page form select:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-}
-
-.form-page input.error,
-.form-page textarea.error,
-.form-page select.error {
-  border-color: #ef4444;
-}
-
-.form-page textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-
-
-.form-page input[type="checkbox"],
-.form-page input[type="radio"] {
-  width: 20px;
-  height: 20px;
-  margin-right: 12px;
-  cursor: pointer;
-  accent-color: var(--accent-color);
-  flex-shrink: 0;
-}
-
-.form-page input[type="checkbox"] + label,
-.form-page input[type="radio"] + label {
-  display: inline-flex;
-  align-items: center;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.form-page label {
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: var(--text-color);
-  font-size: 16px;
-}
-
-.field-description {
-  margin-top: 8px;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-.error-message {
-  margin-top: 8px;
-  color: #ef4444;
-  font-size: 14px;
-}
-
-.error-message-global {
-  background: rgba(239, 68, 68, 0.1);
-  border: 2px solid #ef4444;
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 24px;
-  color: #ef4444;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.5;
-}
-
-.error-message-global {
-  background: rgba(239, 68, 68, 0.1);
-  border: 2px solid #ef4444;
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin-bottom: 24px;
-  color: #ef4444;
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.5;
-}
-
-.success-message {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 48px;
   text-align: center;
 }
 
-.success-message h2 {
-  color: var(--accent-color);
+.form-title {
+  font-family: "Playfair Display", serif;
   font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
 }
 
-.btn {
-  padding: 16px 32px;
-  border-radius: 8px;
+.security-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b6b80;
+  background: #f4f4f5;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.fields-container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.field-label {
+  display: block;
+  font-size: 14px;
   font-weight: 600;
-  font-size: 16px;
+  margin-bottom: 10px;
+  color: #000;
+}
+
+.required-mark {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+/* ─── Inputs ────────────────────────────────────────────────── */
+.form-viewer input[type="text"],
+.form-viewer input[type="email"],
+.form-viewer input[type="number"],
+.form-viewer textarea,
+.form-viewer select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #e8e8ec;
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fcfcfd;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+  color: #000;
+}
+
+.form-viewer input:focus,
+.form-viewer textarea:focus,
+.form-viewer select:focus {
+  outline: none;
+  border-color: #000;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.03);
+}
+
+.form-viewer input.error,
+.form-viewer textarea.error,
+.form-viewer select.error {
+  border-color: #ef4444;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkbox-wrapper, .radio-wrapper {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 12px 16px;
+  background: #fcfcfd;
+  border: 1.5px solid #e8e8ec;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.checkbox-wrapper:hover, .radio-wrapper:hover {
+  border-color: #000;
+  background: white;
+}
+
+.checkbox-text, .radio-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+input[type="checkbox"], input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #000;
+}
+
+.btn-submit {
+  width: 100%;
+  margin-top: 48px;
+  background: #000;
+  color: #fff;
   border: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  margin-top: 24px;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  color: white;
-  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.4);
+.btn-submit:hover {
+  background: #1f1f2e;
+  transform: translateY(-1px);
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px 0 rgba(139, 92, 246, 0.5);
+/* ─── Messages ──────────────────────────────────────────────── */
+.field-hint {
+  font-size: 13px;
+  color: #6b6b80;
+  margin-top: 8px;
 }
 
-@media (max-width: 768px) {
-  .form-page form {
-    padding: 32px 24px;
-  }
+.field-error-msg {
+  font-size: 13px;
+  color: #ef4444;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.error-banner {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ─── Success Screen ───────────────────────────────────────── */
+.success-screen {
+  background: white;
+  border: 1px solid #e8e8ec;
+  border-radius: 24px;
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #f0fdf4;
+  color: #22c55e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 32px;
+}
+
+.success-title {
+  font-family: "Playfair Display", serif;
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.success-desc {
+  color: #6b6b80;
+  font-size: 16px;
+}
+
+/* ─── Footer ────────────────────────────────────────────────── */
+.viewer-footer {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.powered-by {
+  font-size: 12px;
+  color: #a1a1aa;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.powered-by span {
+  color: #000;
+  font-weight: 700;
 }
 </style>
-

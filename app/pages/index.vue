@@ -15,155 +15,188 @@ async function handleCreateForm() {
   <div class="landing-page">
     <!-- Hero Section -->
     <section class="hero">
-      <div class="container">
-        <h1 class="hero-headline">Forms without tracking</h1>
+      <div class="hero-glow hero-glow-1"></div>
+      <div class="hero-glow hero-glow-2"></div>
+      <div class="hero-glow hero-glow-3"></div>
+      
+      <div class="container hero-content">
+        <h1 class="hero-headline">
+          The Form <em>Engine</em> for Privacy Professionals
+        </h1>
         <p class="hero-subheadline">
-          A privacy-first form builder. No cookies, no fingerprinting, no analytics.
+          A minimalist form builder designed for security-conscious teams. 
+          No cookies, no fingerprinting, just clean submissions.
         </p>
         <div class="hero-cta">
-          <button @click="handleCreateForm" class="btn btn-primary">Create a form</button>
-          <NuxtLink v-if="!authLoading && isAuthenticated" to="/forms" class="btn btn-secondary">My Forms</NuxtLink>
-        </div>
-        <div class="hero-trust">
-          <span class="trust-text">Trusted by developers and privacy-conscious teams</span>
+          <button @click="handleCreateForm" class="btn btn-hero-primary">Get Started</button>
+          <NuxtLink v-if="!authLoading && isAuthenticated" to="/forms" class="btn btn-hero-secondary">View Dashboard</NuxtLink>
         </div>
       </div>
     </section>
 
-    <!-- Philosophy -->
-    <section class="philosophy">
-      <div class="container">
-        <div class="section-label">Philosophy</div>
-        <h2 class="section-heading">GhostForm is opinionated</h2>
-        <p class="philosophy-text">
-          GhostForm is a privacy-first form builder. We handle submissions server-side, encrypt sensitive data, and give you full control. No tracking, no cookies, no JavaScript required.
-        </p>
-      </div>
-    </section>
 
     <!-- Core Features -->
     <section id="features" class="features">
       <div class="container">
-        <div class="section-label">Features</div>
-        <h2 class="section-heading">Everything you need</h2>
+        <div class="section-label">Our Platform</div>
+        <h2 class="section-heading">Built for the Modern Web</h2>
+        
         <div class="features-grid">
           <div class="feature-item">
-            <h3>Form Builder</h3>
-            <p>Build forms with standard field types. Server-first validation. Works without JavaScript.</p>
+            <div class="feature-icon-wrapper">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <h3>Architect Engine</h3>
+            <p>Define enterprise-grade schemas in seconds. Server-side validation protocols ensure absolute data integrity.</p>
           </div>
           <div class="feature-item">
-            <h3>Zero Tracking</h3>
-            <p>No cookies, no fingerprinting, no analytics. IPs only for rate limiting. GDPR-friendly by design.</p>
+            <div class="feature-icon-wrapper">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <h3>Stealth Protocol</h3>
+            <p>Zero tracking by design. No persistent identifiers, no fingerprinting, no third-party scripts. Only the data you need.</p>
           </div>
           <div class="feature-item">
-            <h3>Submission Inbox</h3>
-            <p>View submissions in a clean interface. Encrypted at rest. Auto-delete options.</p>
+            <div class="feature-icon-wrapper">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+            </div>
+            <h3>RSA Encryption</h3>
+            <p>Automated encryption at rest. Every single submission is shielded using military-grade cryptographic standards.</p>
           </div>
           <div class="feature-item">
-            <h3>Developer APIs</h3>
-            <p>POST endpoints, webhooks, and JSON exports. Works with any framework.</p>
+            <div class="feature-icon-wrapper">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="16 18 22 12 16 6"/>
+                <polyline points="8 6 2 12 8 18"/>
+              </svg>
+            </div>
+            <h3>System Bridge</h3>
+            <p>High-performance POST endpoints and native webhooks. Orchestrate your data flow across any infrastructure.</p>
           </div>
           <div class="feature-item">
-            <h3>Simple Embedding</h3>
-            <p>Standard HTML form action URLs. No JavaScript required.</p>
+            <div class="feature-icon-wrapper">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 3v10"/>
+                <path d="M8 9l4 4 4-4"/>
+                <path d="M5 21h14"/>
+              </svg>
+            </div>
+            <h3>Signal Routing</h3>
+            <p>Trigger instant notifications with webhook fan-out and reliable delivery controls for downstream systems.</p>
           </div>
           <div class="feature-item">
-            <h3>Rate Limiting</h3>
-            <p>Protect your forms from spam and abuse with configurable per-IP rate limits. Set submissions per hour for each form.</p>
+            <div class="feature-icon-wrapper">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M3 12h18"/>
+                <path d="M12 3v18"/>
+                <circle cx="12" cy="12" r="9"/>
+              </svg>
+            </div>
+            <h3>Global Access</h3>
+            <p>Deploy once and collect submissions worldwide with low-latency endpoints and consistent validation behavior.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- How It Works -->
+    <!-- How It Works (Dark Section) -->
     <section class="how-it-works">
       <div class="container">
-        <div class="section-label">How it works</div>
-        <h2 class="section-heading">Simple and secure</h2>
-        <div class="steps">
-          <div class="step">
-            <div class="step-number">01</div>
-            <h3>Create a form</h3>
-            <p>Build your form with our simple builder.</p>
+        <div class="how-grid">
+          <div class="how-content">
+            <div class="section-label">Workflow</div>
+            <h2 class="section-heading">Simple and efficient</h2>
+            <div class="steps-list">
+              <div class="step">
+                <div class="step-num">01</div>
+                <div>
+                  <h4>Create your form</h4>
+                  <p>Design your fields using our intuitive builder interface.</p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num">02</div>
+                <div>
+                  <h4>Embed anywhere</h4>
+                  <p>Use our simple HTML copy-paste snippets or iframe options.</p>
+                </div>
+              </div>
+              <div class="step">
+                <div class="step-num">03</div>
+                <div>
+                  <h4>Analyze data</h4>
+                  <p>Receive submissions instantly and view them in our secure dashboard.</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="step">
-            <div class="step-number">02</div>
-            <h3>Embed anywhere</h3>
-            <p>Copy the HTML and add it to your site.</p>
-          </div>
-          <div class="step">
-            <div class="step-number">03</div>
-            <h3>Receive submissions</h3>
-            <p>Get submissions via webhook or API.</p>
+          <div class="how-visual">
+            <div class="phone-frame-wrapper">
+              <div class="phone-frame">
+                <div class="phone-notch"></div>
+                <div class="phone-content">
+                  <header class="phone-header">
+                    <div class="phone-logo">
+                    </div>
+                    <div class="builder-status">Building...</div>
+                  </header>
+                  
+                  <div class="phone-body">
+                    <div class="field-stack">
+                      <!-- Mobile Field Items -->
+                      <div class="field-item-ghost">
+                        <div class="field-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+                        <div class="field-info">
+                          <span class="field-label">Full Name</span>
+                          <span class="field-type">Text Input</span>
+                        </div>
+                      </div>
+                      <div class="field-item-ghost active">
+                        <div class="field-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+                        <div class="field-info">
+                          <span class="field-label">Email Address</span>
+                          <span class="field-type">Secure Email</span>
+                        </div>
+                      </div>
+                      <div class="field-item-ghost">
+                        <div class="field-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                        <div class="field-info">
+                          <span class="field-label">Feedback</span>
+                          <span class="field-type">Textarea</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="visual-footer-btn builder-btn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="margin-right:8px;">
+                        <path d="M12 5v14M5 12h14"/>
+                      </svg>
+                      Add Secure Field
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="visual-glow scale-up"></div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Developer Experience -->
-    <section class="developer-experience">
+    <!-- Call to Action -->
+    <section class="final-cta">
       <div class="container">
-        <div class="section-label">Developer Experience</div>
-        <h2 class="section-heading">Built for developers</h2>
-        <div class="dev-features">
-          <div class="dev-feature">
-            <h3>Standard HTML</h3>
-            <p>Use native form elements. No frameworks required.</p>
-          </div>
-          <div class="dev-feature">
-            <h3>POST Endpoints</h3>
-            <p>Each form has its own endpoint.</p>
-          </div>
-          <div class="dev-feature">
-            <h3>Webhooks</h3>
-            <p>Receive submissions instantly via webhooks.</p>
-          </div>
-          <div class="dev-feature">
-            <h3>JSON Export</h3>
-            <p>Export all submissions as JSON.</p>
-          </div>
-          <div class="dev-feature">
-            <h3>RESTful API</h3>
-            <p>Full REST API access for programmatic form management.</p>
-          </div>
-          <div class="dev-feature">
-            <h3>Custom Validation</h3>
-            <p>Server-side validation rules with custom error messages.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Privacy & Security -->
-    <section class="privacy-security">
-      <div class="container">
-        <div class="section-label">Privacy & Security</div>
-        <h2 class="section-heading">Zero tracking</h2>
-        <div class="privacy-features">
-          <div class="privacy-feature">
-            <h3>No cookies</h3>
-            <p>GhostForm never sets cookies.</p>
-          </div>
-          <div class="privacy-feature">
-            <h3>No fingerprinting</h3>
-            <p>We don't collect browser fingerprints.</p>
-          </div>
-          <div class="privacy-feature">
-            <h3>No IP tracking</h3>
-            <p>IP addresses are only stored for rate limiting (abuse prevention), never for tracking or analytics.</p>
-          </div>
-          <div class="privacy-feature">
-            <h3>Encrypted at rest</h3>
-            <p>All submissions are encrypted.</p>
-          </div>
-          <div class="privacy-feature">
-            <h3>Data ownership</h3>
-            <p>You own all your data. Export or delete anytime.</p>
-          </div>
-          <div class="privacy-feature">
-            <h3>Open source</h3>
-            <p>Transparent codebase. Audit and verify our privacy claims.</p>
-          </div>
+        <div class="cta-inner">
+          <h2>Build private forms, fast.</h2>
+          <p>Create secure forms in minutes.</p>
+          <button @click="handleCreateForm" class="btn btn-hero-primary btn-cta-large">Deploy Infrastructure</button>
         </div>
       </div>
     </section>
@@ -173,33 +206,28 @@ async function handleCreateForm() {
       <div class="container">
         <div class="footer-content">
           <div class="footer-brand">
-            <div class="footer-logo-container">
-              <img src="https://2lyfanvqy9.ufs.sh/f/ocSxC2zlR1ZudeifziJBwa5XY2FSC4HTUJ1qyMhjvOuA7rKo" alt="GhostForm" class="logo-image" />
-              <span class="logo-text">GhostForm</span>
+            <div class="footer-logo">
+              <img src="/ghostform-logo.svg" alt="GhostForm" />
+              <span>GhostForm</span>
             </div>
-            <p class="footer-tagline">Privacy-first form builder</p>
+            <p>Privacy-first form builder for the modern web.</p>
           </div>
           <div class="footer-links">
-            <div class="footer-column">
-              <h4>Product</h4>
+            <div class="link-group">
+              <h5>Product</h5>
               <a href="#features">Features</a>
               <NuxtLink to="/docs">Documentation</NuxtLink>
             </div>
-            <div class="footer-column">
-              <h4>Resources</h4>
-              <a href="#">GitHub</a>
-              <NuxtLink to="/docs#api-reference">API Reference</NuxtLink>
-              <a href="#">Changelog</a>
-            </div>
-            <div class="footer-column">
-              <h4>Legal</h4>
+            <div class="link-group">
+              <h5>Legal</h5>
               <NuxtLink to="/privacy">Privacy Policy</NuxtLink>
               <NuxtLink to="/terms">Terms of Service</NuxtLink>
             </div>
           </div>
         </div>
         <div class="footer-bottom">
-          <p>&copy; 2025 GhostForm. All rights reserved.</p>
+          <p>&copy; 2026 GhostForm. Built for privacy.</p>
+          <p class="footer-signature">Made with <span class="heart">❤️</span> by <a href="https://www.marvlock.dev" target="_blank"><em>marvlock</em></a></p>
         </div>
       </div>
     </footer>
@@ -208,464 +236,702 @@ async function handleCreateForm() {
 
 <style scoped>
 .landing-page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background-color: var(--bg-color);
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 40px;
-}
-
+/* ─── Hero Section ─────────────────────────────────────────── */
 .hero {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow: hidden;
+  padding: 120px 0;
   text-align: center;
-  position: relative;
-  padding: 0;
 }
 
-.hero .container {
-  width: 100%;
+.hero-glow {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  filter: blur(120px);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-glow-1 { top: -20%; left: -10%; background: radial-gradient(circle, #ff6b00 0%, transparent 70%); }
+.hero-glow-2 { bottom: -20%; right: -10%; background: radial-gradient(circle, #00d4ff 0%, transparent 70%); }
+.hero-glow-3 { top: 20%; left: 30%; background: radial-gradient(circle, #ff0055 0%, transparent 60%); opacity: 0.1; }
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  max-width: 900px;
 }
 
 .hero-headline {
-  font-size: 64px;
-  font-weight: 800;
-  line-height: 1.1;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(40px, 8vw, 84px);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   margin-bottom: 24px;
-  color: var(--text-color);
-  letter-spacing: -0.04em;
-  max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+}
+
+.hero-headline em {
+  font-style: italic;
+  font-weight: 400;
 }
 
 .hero-subheadline {
-  font-size: 22px;
-  line-height: 1.6;
+  font-size: clamp(18px, 2.5vw, 22px);
+  line-height: 1.5;
   color: var(--text-secondary);
-  max-width: 720px;
-  margin: 0 auto 40px;
-  font-weight: 400;
-  letter-spacing: -0.01em;
-}
-
-.hero-trust {
-  margin-top: 48px;
-  padding-top: 32px;
-  border-top: 1px solid var(--border-color);
-}
-
-.trust-text {
-  font-size: 14px;
-  color: var(--text-secondary);
-  font-weight: 500;
+  max-width: 680px;
+  margin: 0 auto 48px;
 }
 
 .hero-cta {
   display: flex;
   gap: 16px;
   justify-content: center;
-  flex-wrap: wrap;
 }
 
 .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 32px;
+  padding: 14px 32px;
   font-size: 16px;
   font-weight: 600;
-  text-decoration: none;
-  border-radius: 10px;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid transparent;
+  border-radius: 12px;
   cursor: pointer;
-  letter-spacing: -0.01em;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  color: white;
-  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.4);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
+  font-family: inherit;
 }
 
-.btn-primary:hover {
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+.btn-hero-primary {
+  background: #000;
+  color: #fff;
+}
+
+.btn-hero-primary:hover {
+  background: #1a1a1a;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px 0 rgba(139, 92, 246, 0.5);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.btn-secondary {
-  background-color: transparent;
-  color: var(--text-color);
-  border: 2px solid var(--border-color);
+.btn-hero-secondary {
+  background: rgba(0, 0, 0, 0.04);
+  color: #111111;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
 }
 
-.btn-secondary:hover {
-  border-color: var(--accent-color);
-  color: var(--accent-color);
-  background-color: transparent;
+.btn-hero-secondary:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
 }
 
-section {
-  padding: 120px 0;
-  position: relative;
+/* ─── Features Section ─────────────────────────────────────── */
+.features {
+  padding: 140px 0;
+  background-color: var(--bg-color);
 }
 
 .section-label {
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--accent-color);
+  font-size: 13px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
   margin-bottom: 16px;
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
+
+.section-label.dark { color: rgba(255, 255, 255, 0.4); }
 
 .section-heading {
-  font-size: 48px;
-  font-weight: 800;
-  margin-bottom: 64px;
-  color: var(--text-color);
-  letter-spacing: -0.03em;
-  line-height: 1.2;
-  max-width: 800px;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 700;
+  margin-bottom: 72px;
+  letter-spacing: -0.02em;
 }
 
-.philosophy {
-  background-color: var(--section-bg);
-}
-
-.philosophy-text {
-  font-size: 20px;
-  line-height: 1.75;
-  color: var(--text-color);
-  max-width: 900px;
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  margin-top: 0;
-}
+.section-heading.dark { color: white; }
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
 }
 
 .feature-item {
-  padding: 40px;
-  border-radius: 16px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 48px;
+  border-radius: 2px;
+  background-color: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
 }
 
 .feature-item:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--accent-color);
-  background: linear-gradient(135deg, var(--card-bg), rgba(139, 92, 246, 0.03));
+  background-color: #000;
+  border-color: #000;
+  transform: translateY(-8px);
+}
+
+.feature-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  background: #f5f5f7;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+  transition: all 0.4s ease;
+}
+
+.feature-item:hover .feature-icon-wrapper {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
 }
 
 .feature-item h3 {
+  font-family: "Playfair Display", serif;
   font-size: 22px;
   font-weight: 700;
-  margin-bottom: 16px;
-  color: var(--text-color);
-  letter-spacing: -0.02em;
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+  transition: color 0.4s ease;
+}
+
+.feature-item:hover h3 {
+  color: #fff;
 }
 
 .feature-item p {
   color: var(--text-secondary);
   line-height: 1.7;
-  font-size: 16px;
+  font-size: 15px;
+  transition: color 0.4s ease;
 }
 
+.feature-item:hover p {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ─── How It Works (Dark) ─────────────────────────────────── */
 .how-it-works {
-  background-color: var(--section-bg);
+  padding: 140px 0;
+  background-color: #fcfcfd;
+  color: var(--text-color);
+  overflow: hidden;
+  border-top: 1px solid #f0f0f2;
 }
 
-.steps {
+.how-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 48px;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+@media (max-width: 968px) {
+  .how-grid { grid-template-columns: 1fr; }
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 }
 
 .step {
-  padding: 32px;
-  border-radius: 16px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  transition: all 0.2s;
-  position: relative;
+  display: flex;
+  gap: 24px;
 }
 
-.step:hover {
-  border-color: var(--accent-color);
-  box-shadow: var(--shadow-sm);
-}
-
-.step-number {
-  font-size: 56px;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  opacity: 0.4;
-  margin-bottom: 20px;
-  line-height: 1;
-  letter-spacing: -0.02em;
-}
-
-.step h3 {
-  font-size: 26px;
+.step-num {
+  font-size: 14px;
   font-weight: 700;
-  margin-bottom: 16px;
-  color: var(--text-color);
-  letter-spacing: -0.02em;
+  color: rgba(0, 0, 0, 0.15);
+  margin-top: 4px;
+}
+
+.step h4 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
 }
 
 .step p {
   color: var(--text-secondary);
-  line-height: 1.7;
-  font-size: 16px;
+  max-width: 400px;
 }
 
-.dev-features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+.how-visual {
+  position: relative;
 }
 
-.dev-feature {
-  padding: 32px;
-  border-radius: 16px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  transition: all 0.2s;
+.phone-frame-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
 }
 
-.dev-feature:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent-color);
-  box-shadow: var(--shadow-sm);
+.phone-frame {
+  width: 280px;
+  height: 560px;
+  background: #0a0a0f;
+  border: 8px solid #1a1a24;
+  border-radius: 40px;
+  padding: 12px;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
 }
 
-.dev-feature h3 {
-  font-size: 21px;
+.phone-notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 24px;
+  background: #1a1a24;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  z-index: 10;
+}
+
+.phone-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #111118;
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.phone-header {
+  padding: 32px 20px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.phone-logo img {
+  height: 20px;
+}
+
+.builder-status {
+  font-size: 9px;
   font-weight: 700;
-  margin-bottom: 12px;
-  color: var(--text-color);
-  letter-spacing: -0.02em;
+  color: #ff6b00;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
-.dev-feature p {
-  color: var(--text-secondary);
-  line-height: 1.7;
-  font-size: 16px;
+.phone-body {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
-.privacy-security {
-  background-color: var(--section-bg);
+.field-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: auto;
 }
 
-.privacy-features {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
-}
-
-.privacy-feature {
-  padding: 40px;
+.field-item-ghost {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.privacy-feature:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: var(--accent-secondary);
-  background: linear-gradient(135deg, var(--card-bg), rgba(6, 182, 212, 0.03));
+.field-item-ghost.active {
+  background: rgba(0, 212, 255, 0.05);
+  border-color: rgba(0, 212, 255, 0.2);
 }
 
-.privacy-feature h3 {
-  font-size: 22px;
+.field-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.field-item-ghost.active .field-icon {
+  background: #00d4ff;
+  color: #000;
+}
+
+.field-info {
+  flex: 1;
+}
+
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.field-type {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.visual-footer-btn {
+  height: 48px;
+  background: #ffffff;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
   font-weight: 700;
-  margin-bottom: 16px;
-  color: var(--text-color);
-  letter-spacing: -0.02em;
+  font-size: 13px;
+  margin-top: 20px;
 }
 
-.privacy-feature p {
-  color: var(--text-secondary);
-  line-height: 1.7;
-  font-size: 16px;
+.visual-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, #005eff 0%, transparent 70%);
+  opacity: 0.15;
+  z-index: 1;
+  filter: blur(80px);
 }
 
+.visual-glow.scale-up {
+  width: 140%;
+  height: 140%;
+  opacity: 0.2;
+}
+
+
+/* ─── Footer ──────────────────────────────────────────────── */
 .footer {
-  margin-top: auto;
   padding: 100px 0 40px;
-  border-top: 1px solid var(--border-color);
-  background-color: var(--section-bg);
+  background-color: #ffffff;
+  border-top: 1px solid #f0f0f2;
 }
 
 .footer-content {
   display: grid;
-  grid-template-columns: 2fr 3fr;
+  grid-template-columns: 2fr 1fr;
   gap: 80px;
-  margin-bottom: 64px;
+  margin-bottom: 80px;
 }
 
-.footer-brand {
-  max-width: 300px;
+@media (max-width: 768px) {
+  .footer-content { grid-template-columns: 1fr; gap: 48px; }
 }
 
-.footer-logo-container {
+.footer-logo {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
-.footer-logo-container .logo-image {
-  height: 40px;
-  width: auto;
-  object-fit: contain;
-}
+.footer-logo img { height: 28px; }
+.footer-logo span { font-size: 20px; font-weight: 700; letter-spacing: -0.03em; }
 
-.footer-logo-container .logo-text {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-color);
-  letter-spacing: -0.02em;
-}
-
-.footer-tagline {
+.footer-brand p {
   color: var(--text-secondary);
-  font-size: 16px;
-  line-height: 1.6;
+  max-width: 300px;
 }
 
 .footer-links {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 64px;
+  display: flex;
+  gap: 60px;
 }
 
-.footer-column h4 {
+.link-group h5 {
   font-size: 14px;
   font-weight: 700;
-  color: var(--text-color);
-  margin-bottom: 20px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
+  margin-bottom: 24px;
 }
 
-.footer-column a {
+.link-group a {
   display: block;
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 15px;
-  margin-bottom: 14px;
-  transition: color 0.2s;
+  margin-bottom: 16px;
+  transition: color 0.15s;
 }
 
-.footer-column a:hover {
-  color: var(--accent-color);
-}
+.link-group a:hover { color: #000; }
 
 .footer-bottom {
   padding-top: 40px;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid #f0f0f2;
   text-align: center;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.4);
+}
+field-type {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.footer-bottom p {
-  color: var(--text-secondary);
+.drag-handle {
+  color: rgba(255, 255, 255, 0.1);
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.builder-btn {
+  background: #ffffff;
+  color: #000;
+  cursor: default;
+}
+
+.builder-btn:hover {
+  background: #f0f0f0;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.code-block {
+  font-family: inherit;
+  margin-bottom: 32px;
+}
+
+.code-line {
+  font-family: "SF Mono", "Monaco", "Inconsolata", monospace;
+  font-size: 13px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.code-key { color: #8080ff; }
+.code-string { color: #00d4ff; }
+.code-boolean { color: #ff6b00; }
+.code-comment { color: rgba(255, 255, 255, 0.2); font-style: italic; }
+
+.visual-embed-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 32px;
+}
+
+.embed-label-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.status-indicator {
+  color: #00ffaa;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-indicator::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  background: #00ffaa;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00ffaa;
+}
+
+.embed-code-line {
+  font-family: monospace;
+  font-size: 11px;
+  color: #ffffff;
+  opacity: 0.8;
+}
+
+.visual-footer-btn {
+  height: 48px;
+  background: #ffffff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-weight: 700;
   font-size: 14px;
 }
 
-@media (max-width: 768px) {
-  .container {
-    padding: 0 24px;
-  }
-
-  .hero {
-    min-height: 100vh;
-    padding: 80px 0;
-  }
-
-  .hero-headline {
-    font-size: 48px;
-  }
-
-  .hero-subheadline {
-    font-size: 20px;
-  }
-
-  .section-heading {
-    font-size: 36px;
-    margin-bottom: 48px;
-  }
-
-  section {
-    padding: 80px 0;
-  }
-
-  .features-grid,
-  .dev-features,
-  .privacy-features,
-  .steps {
-    grid-template-columns: 1fr;
-    gap: 32px;
-  }
-
-  .btn {
-    width: 100%;
-    max-width: 280px;
-  }
-
-  .footer-content {
-    grid-template-columns: 1fr;
-    gap: 48px;
-  }
-
-  .footer-links {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 32px;
-  }
+.cursor-blink {
+  margin-left: 4px;
+  animation: blink 1s infinite;
 }
 
-@media (max-width: 480px) {
-  .hero-headline {
-    font-size: 36px;
-  }
+@keyframes blink { 
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
 
-  .hero-subheadline {
-    font-size: 18px;
-  }
+.visual-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, #005eff 0%, transparent 70%);
+  opacity: 0.15;
+  z-index: 1;
+  filter: blur(80px);
+}
 
-  .section-heading {
-    font-size: 28px;
-  }
+/* ─── Final CTA ───────────────────────────────────────────── */
+.final-cta {
+  padding: 160px 0;
+  text-align: center;
+  background-color: #fcfcfd;
+  color: var(--text-color);
+  border-top: 1px solid #f0f0f2;
+}
 
-  .footer-links {
-    grid-template-columns: 1fr;
-  }
+.cta-inner {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.cta-inner h2 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(36px, 6vw, 56px);
+  margin-bottom: 24px;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.cta-inner p {
+  color: var(--text-secondary);
+  font-size: 20px;
+  margin-bottom: 48px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-cta-large {
+  padding: 18px 48px;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  background: #000;
+  color: #fff;
+}
+
+.btn-cta-large:hover {
+  background: #1a1a1a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ─── Footer ──────────────────────────────────────────────── */
+.footer {
+  padding: 100px 0 40px;
+  background-color: #ffffff;
+  border-top: 1px solid #f0f0f2;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 80px;
+  margin-bottom: 80px;
+}
+
+@media (max-width: 768px) {
+  .footer-content { grid-template-columns: 1fr; gap: 48px; }
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.footer-logo img { height: 28px; }
+.footer-logo span { font-size: 20px; font-weight: 700; letter-spacing: -0.03em; }
+
+.footer-brand p {
+  color: var(--text-secondary);
+  max-width: 300px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 60px;
+}
+
+.link-group h5 {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 24px;
+}
+
+.link-group a {
+  display: block;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 15px;
+  margin-bottom: 16px;
+  transition: color 0.15s;
+}
+
+.link-group a:hover { color: #000; }
+
+.footer-bottom {
+  padding-top: 40px;
+  border-top: 1px solid #f0f0f2;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.4);
 }
 </style>
-

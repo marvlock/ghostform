@@ -45,20 +45,14 @@ try {
   loading.value = false
 }
 
-function formatDate(dateString: string) {
-  const date = new Date(dateString)
-  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-}
-
 function formatDateTime(dateString: string) {
   const date = new Date(dateString)
-  return date.toLocaleString([], { 
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
+  return date.toLocaleString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit' 
   })
 }
 
@@ -86,51 +80,61 @@ function getFieldLabel(fieldId: string) {
   <div class="submissions-page">
     <div class="container">
       <div class="page-header">
-        <div>
-          <NuxtLink to="/forms" class="back-link">← Back to Forms</NuxtLink>
-          <h1>{{ form?.name || 'Submissions' }}</h1>
-          <p class="subtitle">{{ submissions.length }} {{ submissions.length === 1 ? 'submission' : 'submissions' }}</p>
+        <div class="header-main">
+          <NuxtLink to="/forms" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Dashboard
+          </NuxtLink>
+          <h1 class="page-title">{{ form?.name || 'Submissions' }}</h1>
+          <p class="page-subtitle">{{ submissions.length }} secure declarations received.</p>
         </div>
-        <button v-if="submissions.length > 0" @click="exportJSON" class="btn btn-secondary">
-          Export JSON
-        </button>
+        <div class="header-actions">
+          <button v-if="submissions.length > 0" @click="exportJSON" class="btn btn-subtle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Export Dataset
+          </button>
+        </div>
       </div>
 
-      <div v-if="loading" class="loading">
-        Loading submissions...
+      <div v-if="loading" class="state-container">
+        <div class="spinner"></div>
+        <p>Decrypting records...</p>
       </div>
 
-      <div v-else-if="error" class="error-state">
+      <div v-else-if="error" class="state-container error">
         <p>{{ error }}</p>
       </div>
 
-      <div v-else-if="submissions.length === 0" class="empty-state">
-        <p>No submissions yet.</p>
-        <NuxtLink :to="`/form/${slug}`" class="btn btn-primary" target="_blank">View Form</NuxtLink>
+      <div v-else-if="submissions.length === 0" class="state-container empty">
+        <div class="empty-icon">∅</div>
+        <h2>No submissions yet</h2>
+        <p>This endpoint is ready to receive data.</p>
+        <NuxtLink :to="`/form/${slug}`" class="btn btn-primary" target="_blank">Test Endpoint</NuxtLink>
       </div>
 
-      <div v-else class="submissions-container">
+      <div v-else class="submissions-stack">
         <div v-for="(submission, index) in submissions" :key="submission.id" class="submission-card">
-          <div class="submission-header">
-            <span class="submission-number">#{{ submissions.length - index }}</span>
-            <span class="submission-date">{{ formatDateTime(submission.createdAt) }}</span>
+          <div class="card-header">
+            <span class="sub-id">#{{ submissions.length - index }}</span>
+            <span class="sub-date">{{ formatDateTime(submission.createdAt) }}</span>
           </div>
-          <div v-if="submission.data && typeof submission.data === 'object' && Object.keys(submission.data).length > 0" class="submission-data">
-            <div v-for="(value, fieldId) in submission.data" :key="fieldId" class="submission-field">
-              <label>{{ getFieldLabel(fieldId) }}</label>
-              <div class="field-value">
-                <span v-if="Array.isArray(value)">{{ value.join(', ') }}</span>
-                <span v-else-if="value === null || value === undefined">(empty)</span>
-                <span v-else>{{ String(value) }}</span>
+          
+          <div class="card-content">
+            <div v-if="submission.data && Object.keys(submission.data).length > 0" class="data-grid">
+              <div v-for="(value, fieldId) in submission.data" :key="fieldId" class="data-item">
+                <span class="data-label">{{ getFieldLabel(fieldId) }}</span>
+                <div class="data-value">
+                  <span v-if="Array.isArray(value)">{{ value.join(', ') }}</span>
+                  <span v-else-if="value === null || value === undefined" class="is-empty">Empty</span>
+                  <span v-else>{{ String(value) }}</span>
+                </div>
               </div>
             </div>
-          </div>
-          <div v-else class="submission-data">
-            <div class="submission-field">
-              <div class="field-value" style="color: var(--text-secondary); font-style: italic;">
-                No data available
-              </div>
-            </div>
+            <p v-else class="no-data">Payload delivered (No field data captured).</p>
           </div>
         </div>
       </div>
@@ -141,182 +145,176 @@ function getFieldLabel(fieldId: string) {
 <style scoped>
 .submissions-page {
   min-height: 100vh;
-  padding: 40px 0;
-  background-color: var(--bg-color);
-}
-
-.container {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 40px;
+  padding: 80px 0;
+  background-color: #fcfcfd;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 40px;
+  align-items: flex-end;
+  margin-bottom: 64px;
+}
+
+@media (max-width: 768px) {
+  .page-header { flex-direction: column; align-items: flex-start; gap: 24px; }
 }
 
 .back-link {
-  display: inline-block;
-  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b6b80;
   text-decoration: none;
   font-size: 14px;
+  font-weight: 600;
   margin-bottom: 12px;
-  transition: color 0.2s;
 }
 
-.back-link:hover {
-  color: var(--accent-color);
-}
+.back-link:hover { color: #000; }
 
-h1 {
-  font-size: 36px;
-  font-weight: 800;
-  color: var(--text-color);
-  margin: 0 0 8px 0;
+.page-title {
+  font-family: "Playfair Display", serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: #000;
   letter-spacing: -0.02em;
 }
 
-.subtitle {
-  color: var(--text-secondary);
-  font-size: 15px;
-  margin: 0;
+.page-subtitle {
+  color: #6b6b80;
+  font-size: 16px;
+  margin-top: 4px;
 }
 
-.loading,
-.error-state,
-.empty-state {
+/* ─── State Containers ─────────────────────────────────────── */
+.state-container {
   text-align: center;
-  padding: 60px 0;
-  color: var(--text-secondary);
+  padding: 100px 0;
+  color: #6b6b80;
 }
 
-.empty-state p {
-  font-size: 18px;
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #f0f0f2;
+  border-top-color: #000;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-icon {
+  font-size: 40px;
+  color: #e8e8ec;
   margin-bottom: 24px;
 }
 
-.submissions-container {
+.empty h2 { color: #000; margin-bottom: 12px; }
+
+/* ─── Submission Stack ─────────────────────────────────────── */
+.submissions-stack {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
 .submission-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 24px;
+  background: white;
+  border: 1px solid #e8e8ec;
+  border-radius: 20px;
+  overflow: hidden;
   transition: all 0.2s;
 }
 
 .submission-card:hover {
-  border-color: var(--accent-color);
-  box-shadow: var(--shadow-sm);
+  border-color: #000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.03);
 }
 
-.submission-header {
+.card-header {
+  background: #fcfcfd;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e8e8ec;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color);
 }
 
-.submission-number {
-  font-weight: 700;
-  color: var(--accent-color);
-  font-size: 16px;
-}
-
-.submission-date {
-  color: var(--text-secondary);
+.sub-id {
   font-size: 13px;
+  font-weight: 700;
+  color: #000;
 }
 
-.submission-data {
+.sub-date {
+  font-size: 13px;
+  color: #6b6b80;
+  font-weight: 500;
+}
+
+.card-content {
+  padding: 24px;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.data-item {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
-.submission-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+.data-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #a1a1aa;
 }
 
-.submission-field label {
-  font-weight: 600;
-  color: var(--text-color);
-  font-size: 14px;
-  text-transform: capitalize;
-}
-
-.field-value {
-  color: var(--text-secondary);
+.data-value {
   font-size: 15px;
-  padding: 10px 14px;
-  background: var(--bg-color);
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  word-break: break-word;
-  white-space: pre-wrap;
+  color: #000;
+  background: #f9f9fb;
+  padding: 12px 16px;
+  border-radius: 12px;
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+.is-empty { color: #d4d4d8; font-style: italic; }
+
+.no-data {
+  color: #6b6b80;
+  font-style: italic;
+  font-size: 14px;
 }
 
 .btn {
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
   font-weight: 600;
-  font-size: 14px;
-  text-decoration: none;
-  border: none;
+  font-size: 15px;
   cursor: pointer;
   transition: all 0.2s;
+  border: none;
+  font-family: inherit;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  color: white;
-  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.4);
-}
+.btn-primary { background: #000; color: #fff; }
+.btn-primary:hover { background: #1f1f2e; }
 
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px 0 rgba(139, 92, 246, 0.5);
-}
-
-.btn-secondary {
-  background: transparent;
-  color: var(--text-color);
-  border: 2px solid var(--border-color);
-}
-
-.btn-secondary:hover {
-  border-color: var(--accent-color);
-  color: var(--accent-color);
-}
-
-@media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  h1 {
-    font-size: 28px;
-  }
-
-  .submission-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-}
+.btn-subtle { background: #f4f4f5; color: #18181b; }
+.btn-subtle:hover { background: #e4e4e7; }
 </style>

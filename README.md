@@ -25,7 +25,7 @@ pnpm install
 ```bash
 MONGODB_URI=your_mongodb_connection_string
 RESEND_API_KEY=your_resend_api_key
-RESEND_FROM_EMAIL=your_email@example.com
+RESEND_FROM_EMAIL="Marvlock <noreply@marvlock.dev>"
 ```
 
 3. Start development server:
@@ -56,4 +56,4 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-A project by [Project Marvlock](https://www.marvlock.dev/) | [GitHub](https://github.com/marvlock/ghostform)
+A project by [Marvlock](https://www.marvlock.dev) | [GitHub](https://github.com/marvlock/ghostform)

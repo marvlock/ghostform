@@ -26,39 +26,69 @@ async function handleLogin() {
 
 <template>
   <div class="auth-page">
-    <div class="auth-container">
-      <div class="auth-left">
-        <div class="auth-card">
-          <h1>GhostForm</h1>
-          <p class="subtitle">Log in to your account</p>
+    <div class="auth-split">
+      <!-- Left side: Form -->
+      <div class="auth-form-side">
+        <div class="auth-content">
+          <h1 class="auth-title">Welcome back</h1>
+          <p class="auth-subtitle">Continue to your privacy dashboard</p>
 
-          <div v-if="error" class="error-message">{{ error }}</div>
+          <div v-if="error" class="error-box">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
+              <circle cx="8" cy="8" r="7" stroke-width="1.5"/>
+              <path d="M8 5v4M8 11h.01" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            {{ error }}
+          </div>
 
           <form @submit.prevent="handleLogin" class="auth-form">
-            <div class="form-group">
-              <label>Email</label>
-              <input v-model="email" type="email" required placeholder="you@example.com" />
+            <div class="field-group">
+              <label for="email">Email address</label>
+              <input 
+                id="email"
+                v-model="email" 
+                type="email" 
+                required 
+                placeholder="marvlock.dev@gmail.com" 
+                :disabled="loading"
+              />
             </div>
-            <div class="form-group">
-              <label>Password</label>
-              <input v-model="password" type="password" required placeholder="••••••••" />
+            
+            <div class="field-group">
+              <div class="label-row">
+                <label for="password">Password</label>
+                <NuxtLink to="/forgot-password" class="label-link">Forgot?</NuxtLink>
+              </div>
+              <input 
+                id="password"
+                v-model="password" 
+                type="password" 
+                required 
+                placeholder="••••••••" 
+                :disabled="loading"
+              />
             </div>
-            <button type="submit" class="btn btn-primary" :disabled="loading">
-              {{ loading ? 'Logging in...' : 'Log In' }}
+
+            <button type="submit" class="btn-auth-primary" :disabled="loading">
+              {{ loading ? 'Authenticating...' : 'Sign In' }}
             </button>
           </form>
 
-          <p class="forgot-password">
-            <NuxtLink to="/forgot-password">Forgot your password?</NuxtLink>
-          </p>
-
           <p class="auth-footer">
-            Don't have an account? <NuxtLink to="/signup">Sign up</NuxtLink>
+            Don't have an account? <NuxtLink to="/signup">Start for free</NuxtLink>
           </p>
         </div>
       </div>
-      <div class="auth-right">
-        <div class="auth-image"></div>
+
+      <!-- Right side: Visual -->
+      <div class="auth-visual-side">
+        <div class="visual-glow-1"></div>
+        <div class="visual-glow-2"></div>
+        <div class="visual-quote">
+          <span class="quote-mark">“</span>
+          <p>Privacy is not an option, and it shouldn't be the price we pay for just getting on the internet.</p>
+          <span class="quote-author">Gary Kovacs</span>
+        </div>
       </div>
     </div>
   </div>
@@ -66,302 +96,144 @@ async function handleLogin() {
 
 <style scoped>
 .auth-page {
-  height: 100vh;
-  max-height: 100vh;
+  min-height: 100vh;
+  background-color: #ffffff;
   display: flex;
-  align-items: stretch;
-  justify-content: stretch;
-  padding: 0;
-  background-color: var(--bg-color);
-  overflow: hidden;
-  box-sizing: border-box;
 }
 
-.auth-container {
-  display: grid;
-  grid-template-columns: 50% 50%;
-  gap: 0;
+.auth-split {
+  display: flex;
   width: 100%;
-  align-items: stretch;
-  height: 100vh;
-  box-sizing: border-box;
 }
 
-.auth-left {
+/* ─── Form Side ───────────────────────────────────────────── */
+.auth-form-side {
+  flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
   padding: 40px;
-  box-sizing: border-box;
+  max-width: 640px;
 }
 
-.auth-right {
-  display: flex;
-  justify-content: stretch;
-  align-items: stretch;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-}
-
-.auth-image {
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-  background-image: url('https://2lyfanvqy9.ufs.sh/f/ocSxC2zlR1ZuztzEeWqDIOHFQRo3StmxwCNcLqXTn9Gb0riK');
-  background-repeat: repeat;
-  background-size: cover;
-  background-position: center;
-  border-radius: 0;
-}
-
-@media (max-width: 968px) {
-  .auth-container {
-    grid-template-columns: 1fr;
-    gap: 0;
-    height: auto;
-    min-height: 100vh;
-  }
-  
-  .auth-page {
-    height: auto;
-    min-height: 100vh;
-    overflow-y: auto;
-  }
-  
-  .auth-left {
-    padding: 20px;
-    min-height: calc(100vh - 200px);
-  }
-  
-  .auth-right {
-    order: -1;
-    height: 200px;
-    min-height: 200px;
-  }
-  
-  .auth-image {
-    height: 200px;
-    min-height: 200px;
-  }
-  
-  .auth-card {
-    padding: 20px;
-    max-width: 100%;
-  }
-  
-  h1 {
-    font-size: 24px;
-  }
-  
-  .subtitle {
-    font-size: 13px;
-    margin-bottom: 20px;
-  }
-  
-  .auth-form {
-    gap: 14px;
-  }
-  
-  input {
-    font-size: 16px;
-    padding: 10px 14px;
-  }
-  
-  .btn {
-    padding: 10px 20px;
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .auth-left {
-    padding: 16px;
-    min-height: calc(100vh - 150px);
-  }
-  
-  .auth-right {
-    height: 150px;
-    min-height: 150px;
-  }
-  
-  .auth-image {
-    height: 150px;
-    min-height: 150px;
-  }
-  
-  .auth-card {
-    padding: 16px;
-    border-radius: 12px;
-  }
-  
-  h1 {
-    font-size: 22px;
-    margin-bottom: 4px;
-  }
-  
-  .subtitle {
-    font-size: 12px;
-    margin-bottom: 18px;
-  }
-  
-  .auth-form {
-    gap: 12px;
-  }
-  
-  label {
-    font-size: 13px;
-  }
-  
-  input {
-    font-size: 16px;
-    padding: 10px 12px;
-  }
-  
-  .btn {
-    padding: 10px 18px;
-    font-size: 14px;
-  }
-  
-  .error-message,
-  .forgot-password,
-  .auth-footer {
-    font-size: 12px;
-  }
-  
-  .forgot-password {
-    margin-top: 10px;
-  }
-  
-  .auth-footer {
-    margin-top: 12px;
-  }
-}
-
-.auth-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 24px;
+.auth-content {
+  margin: auto 0;
   width: 100%;
   max-width: 400px;
-  box-sizing: border-box;
-  overflow: hidden;
+  align-self: center;
 }
 
-h1 {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--text-color);
-  margin-bottom: 6px;
-  text-align: center;
+.auth-title {
+  font-family: "Playfair Display", serif;
+  font-size: 36px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
-.subtitle {
-  text-align: center;
-  color: var(--text-secondary);
-  margin-bottom: 24px;
+.auth-subtitle {
+  color: #6b6b80;
+  font-size: 16px;
+  margin-bottom: 40px;
+}
+
+.error-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #fff5f5;
+  border: 1px solid #feb2b2;
+  color: #c53030;
+  padding: 12px 16px;
+  border-radius: 10px;
   font-size: 14px;
+  margin-bottom: 24px;
 }
 
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 }
 
-.form-group {
+.field-group {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 label {
-  font-weight: 600;
-  color: var(--text-color);
   font-size: 14px;
+  font-weight: 600;
+  color: #000;
+}
+
+.label-link {
+  font-size: 13px;
+  color: #6b6b80;
+  text-decoration: none;
+}
+
+.label-link:hover {
+  color: #000;
 }
 
 input {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 16px;
-  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg-color);
-  color: var(--text-color);
-  transition: border-color 0.2s;
-  box-sizing: border-box;
+  border: 1.5px solid #e8e8ec;
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 0.2s;
+  background: #f9f9fb;
 }
 
 input:focus {
   outline: none;
-  border-color: var(--accent-color);
+  border-color: #000;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.03);
 }
 
-.btn {
-  padding: 12px 24px;
-  border-radius: 8px;
+.btn-auth-primary {
+  margin-top: 12px;
+  background: #000;
+  color: #fff;
+  padding: 14px;
+  border-radius: 12px;
   font-weight: 600;
   font-size: 16px;
   border: none;
   cursor: pointer;
   transition: all 0.2s;
-  width: 100%;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  color: white;
-  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.4);
-}
-
-.btn-primary:hover:not(:disabled) {
+.btn-auth-primary:hover:not(:disabled) {
+  background: #1f1f2e;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px 0 rgba(139, 92, 246, 0.5);
 }
 
-.btn-primary:disabled {
+.btn-auth-primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.error-message {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  font-size: 13px;
-}
-
-.forgot-password {
-  text-align: center;
-  margin-top: 12px;
-  margin-bottom: 0;
-}
-
-.forgot-password a {
-  color: var(--accent-color);
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.forgot-password a:hover {
-  text-decoration: underline;
-}
-
 .auth-footer {
+  margin-top: 32px;
   text-align: center;
-  margin-top: 16px;
-  color: var(--text-secondary);
   font-size: 14px;
+  color: #6b6b80;
 }
 
 .auth-footer a {
-  color: var(--accent-color);
+  color: #000;
   text-decoration: none;
   font-weight: 600;
 }
@@ -369,5 +241,74 @@ input:focus {
 .auth-footer a:hover {
   text-decoration: underline;
 }
-</style>
 
+/* ─── Visual Side ─────────────────────────────────────────── */
+.auth-visual-side {
+  flex: 1;
+  background-color: #0a0a0f;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px;
+  overflow: hidden;
+}
+
+@media (max-width: 968px) {
+  .auth-visual-side { display: none; }
+}
+
+.visual-glow-1 {
+  position: absolute;
+  top: -10%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #ff6b00 0%, transparent 70%);
+  opacity: 0.1;
+  filter: blur(80px);
+}
+
+.visual-glow-2 {
+  position: absolute;
+  bottom: -10%;
+  left: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #00d4ff 0%, transparent 70%);
+  opacity: 0.1;
+  filter: blur(80px);
+}
+
+.visual-quote {
+  position: relative;
+  z-index: 10;
+  max-width: 440px;
+  color: #fff;
+}
+
+.quote-mark {
+  font-family: "Playfair Display", serif;
+  font-size: 80px;
+  line-height: 1;
+  opacity: 0.2;
+  position: absolute;
+  top: -40px;
+  left: -30px;
+}
+
+.visual-quote p {
+  font-size: 24px;
+  line-height: 1.6;
+  font-weight: 400;
+  margin-bottom: 24px;
+}
+
+.quote-author {
+  font-size: 16px;
+  font-weight: 600;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+</style>

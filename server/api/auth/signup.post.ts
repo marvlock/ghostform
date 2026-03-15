@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
   
   try {
     await resend.emails.send({
-      from: process.env.RESEND_FROM_EMAIL || 'GhostForm <onboarding@resend.dev>',
+      from: process.env.RESEND_FROM_EMAIL || 'Marvlock <noreply@marvlock.dev>',
       to: email,
       subject: 'Verify your GhostForm account',
       html: `
