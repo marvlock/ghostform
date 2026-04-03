@@ -1,3 +1,8 @@
 {
-  "public": true
+  "public": true,
+  "functions": {
+    "server/**": {
+      "runtime": "nodejs20.x"
+    }
+  }
 }
